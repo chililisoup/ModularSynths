@@ -13,14 +13,12 @@ import java.nio.ShortBuffer;
 
 @Environment(EnvType.CLIENT)
 public class SynthesizedAudioStream implements AudioStream {
-    private final AudioFormat audioFormat;
-    private final ShortBuffer dataBuffer;
+    private final SynthesizedAudioFormat audioFormat;
+    private final AudioStreamSupplier audioStreamSupplier;
 
-    public SynthesizedAudioStream(short[] soundData) {
-        this.audioFormat = new AudioFormat(ModularSynths.SAMPLE_RATE, 16, 1, true, false);
-        this.dataBuffer = BufferUtils.createShortBuffer(soundData.length);
-        this.dataBuffer.put(soundData);
-        this.dataBuffer.position(0);
+    public SynthesizedAudioStream(AudioStreamSupplier audioStreamSupplier) {
+        this.audioFormat = new SynthesizedAudioFormat(ModularSynths.SAMPLE_RATE, 16, 1, true, false);
+        this.audioStreamSupplier = audioStreamSupplier;
     }
 
     @Override
@@ -31,19 +29,20 @@ public class SynthesizedAudioStream implements AudioStream {
     @Override
     public @NotNull ByteBuffer read(int size) {
         ByteBuffer byteBuffer = BufferUtils.createByteBuffer(size);
+        ShortBuffer shortBuffer = this.audioStreamSupplier.get(size / 2);
 
-        while (byteBuffer.hasRemaining() && this.dataBuffer.hasRemaining()) {
-            short value = this.dataBuffer.get();
+        while (byteBuffer.hasRemaining() && shortBuffer.hasRemaining()) {
+            short value = shortBuffer.get();
             // https://stackoverflow.com/questions/2188660/convert-short-to-byte-in-java
             byteBuffer.put((byte)(value & 0xff)); // little endian
             byteBuffer.put((byte)((value >> 8) & 0xff));
         }
 
-        return  byteBuffer.flip();
+        shortBuffer.clear(); // unnecessary?
+        return  byteBuffer.flip(); // dunno why but it *needs* to be flipped
     }
 
     @Override
     public void close() {
-        this.dataBuffer.clear();
     }
 }

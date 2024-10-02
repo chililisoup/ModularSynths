@@ -3,13 +3,12 @@ package dev.chililisoup.modularsynths.reg;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.ToneBlock;
+import dev.chililisoup.modularsynths.block.CableBlock;
+import dev.chililisoup.modularsynths.block.SpeakerBlock;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -24,7 +23,8 @@ public class ModBlocks {
     private static final HashMap<String, ModBlock> modBlocks = new HashMap<>();
 
     private static void addBlocks() {
-        new ModBlock("tone_block", () -> new ToneBlock(BlockBehaviour.Properties.of())).creativeTabs(CreativeModeTabs.FUNCTIONAL_BLOCKS);
+        new ModBlock("cable", () -> new CableBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("speaker", () -> new SpeakerBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
     }
 
     public static void init() {
@@ -37,6 +37,10 @@ public class ModBlocks {
         RegistrySupplier<? extends Block> block = blocks.register(resourceLocation, modBlock.blockFactory);
         items.register(resourceLocation, () -> modBlock.getItem(block.get()));
         modBlock.set(block);
+    }
+
+    public static Block get(String id) {
+        return modBlocks.get(id).get();
     }
 
     private interface ItemFactory {
@@ -79,9 +83,8 @@ public class ModBlocks {
             return this;
         }
 
-        @SafeVarargs
-        final ModBlock creativeTabs(ResourceKey<CreativeModeTab>... tabs) {
-            Arrays.stream(tabs).forEach(tab -> itemProperties.arch$tab(tab));
+        final ModBlock creativeTabs(CreativeModeTab... tabs) {
+            Arrays.stream(tabs).forEach(itemProperties::arch$tab);
             return this;
         }
     }

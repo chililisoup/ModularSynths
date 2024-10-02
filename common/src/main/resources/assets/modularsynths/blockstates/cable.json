@@ -1,0 +1,116 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_dot"
+      },
+      "when": {
+        "OR": [
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "true",
+            "south": "true",
+            "east": "true",
+            "west": "true"
+          },
+          {
+            "north": "true",
+            "south": "true",
+            "up": "true",
+            "down": "true"
+          },
+          {
+            "east": "true",
+            "west": "true",
+            "up": "true",
+            "down": "true"
+          },
+          {
+            "north": "true",
+            "south": "false"
+          },
+          {
+            "north": "false",
+            "south": "true"
+          },
+          {
+            "east": "true",
+            "west": "false"
+          },
+          {
+            "east": "false",
+            "west": "true"
+          },
+          {
+            "up": "true",
+            "down": "false"
+          },
+          {
+            "up": "false",
+            "down": "true"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end"
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end",
+        "y": 90
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end",
+        "y": 180
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end",
+        "y": 270
+      },
+      "when": {
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end",
+        "x": 270
+      },
+      "when": {
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "modularsynths:block/cable_end",
+        "x": 90
+      },
+      "when": {
+        "down": "true"
+      }
+    }
+  ]
+}

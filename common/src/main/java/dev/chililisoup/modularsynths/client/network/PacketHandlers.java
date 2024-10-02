@@ -15,21 +15,21 @@ public class PacketHandlers {
     }
 
     public static void registerReceivers() {
-        registerReceiver(ClientboundWaveSoundPacket.id(), (buf, context) -> {
-            ClientboundWaveSoundPacket packet = ClientboundWaveSoundPacket.from(buf);
-
-            short[] soundData = new short[44100];
-
-            for (int i = 0; i < soundData.length; i++) {
-                soundData[i] = (short) (32768 * Math.sin(Math.pow(0.001 * i, 2)));
-            }
-
-            SynthesizedAudioPlayer.playSound(
-                    packet.pos.getX(),
-                    packet.pos.getY(),
-                    packet.pos.getZ(),
-                    soundData
-            );
-        });
+//        registerReceiver(ClientboundWaveSoundPacket.id(), (buf, context) -> {
+//            ClientboundWaveSoundPacket packet = ClientboundWaveSoundPacket.from(buf);
+//
+//            short[] soundData = new short[44100];
+//
+//            for (int i = 0; i < soundData.length; i++) {
+//                soundData[i] = (short) (32768 * Math.sin(Math.pow(0.001 * i, 2)));
+//            }
+//
+//            SynthesizedAudioPlayer.playSound(
+//                    packet.pos.getX(),
+//                    packet.pos.getY(),
+//                    packet.pos.getZ(),
+//                    soundData
+//            );
+//        });
     }
 }
