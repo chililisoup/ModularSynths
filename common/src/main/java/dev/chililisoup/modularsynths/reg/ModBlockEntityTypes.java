@@ -17,7 +17,7 @@ public class ModBlockEntityTypes {
     public static Supplier<BlockEntityType<SynthBlockEntity>> SYNTH;
 
     public static void init() {
-        SYNTH = addBlockEntityType("main", SynthBlockEntity::new, ModBlocks.get("speaker"));
+        SYNTH = addBlockEntityType("synth", SynthBlockEntity::new, ModBlocks.get("speaker"));
     }
 
     public static <T extends BlockEntity> Supplier<BlockEntityType<T>> addBlockEntityType(

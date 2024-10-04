@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "modularsynths:block/speaker"
+    "down": "modularsynths:block/module_blank",
+    "east": "modularsynths:block/module_blank",
+    "north": "modularsynths:block/speaker",
+    "particle": "modularsynths:block/speaker",
+    "south": "modularsynths:block/module_input",
+    "up": "modularsynths:block/module_blank",
+    "west": "modularsynths:block/module_blank"
   }
 }

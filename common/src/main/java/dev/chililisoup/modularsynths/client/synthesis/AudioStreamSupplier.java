@@ -10,17 +10,15 @@ import java.nio.ShortBuffer;
 
 public class AudioStreamSupplier {
     private final Level level;
-    private final BlockPos pos;
     private final SynthBlockEntity synthBlockEntity;
 
     public AudioStreamSupplier(Level level, BlockPos pos) {
         this.level = level;
-        this.pos = pos;
         this.synthBlockEntity = (SynthBlockEntity) level.getBlockEntity(pos);
     }
 
     public ShortBuffer get(int size) {
-        short[] soundData = this.synthBlockEntity.request(size);
+        short[] soundData = this.synthBlockEntity.request(level, size);
 
         ShortBuffer shortBuffer = BufferUtils.createShortBuffer(soundData.length);
         shortBuffer.put(soundData);

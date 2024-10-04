@@ -1,17 +1,26 @@
-package dev.chililisoup.modularsynths.client;
+package dev.chililisoup.modularsynths.util;
 
 import dev.chililisoup.modularsynths.ModularSynths;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
-public abstract class WaveFunctions {
+public abstract class SynthesisFunctions {
     private static double convertFrequency(double frequency) {
         return (2.0 * Math.PI * frequency) / ModularSynths.SAMPLE_RATE;
     }
 
-    public static double getFrequencyFromNote(int note) {
-        return Math.pow(2.0, ((double) note + 90.3763165623) / 12.0);
+    public static double getFrequencyFromNote(int note) { // 72 = A @ 440 Hz
+        return Math.pow(2.0, ((double) note - 72.0) / 12.0) * 440.0;
+    }
+
+    public static short getShortFromNote(int note) { // maps 0 - 127 to -32768 - 32767
+        return (short) ((65535.0 / 127.0) * note - 32768.0);
+    }
+
+    public static int getNoteFromShort(short value) { // maps -32768 - 32767 to 0 - 127
+        return (int) Math.round((32768.0 + value) * (127.0 / 65535.0));
+    }
+
+    public static double getFrequencyFromShort(short value) {
+        return getFrequencyFromNote(getNoteFromShort(value));
     }
 
     public static short sineWave(int pos, double frequency, double amplitude) {
@@ -29,6 +38,10 @@ public abstract class WaveFunctions {
         return (short) (amplitude * Short.MAX_VALUE * sum);
     }
 
+    public static short squareWave(int pos, double frequency, double amplitude) {
+        return squareWave(pos, 10, frequency, amplitude);
+    }
+
     public static short triangleWave(int pos, double frequency, double amplitude) {
         frequency = ModularSynths.SAMPLE_RATE / frequency;
         return (short) (amplitude * Short.MAX_VALUE * (4.0 * Math.abs(pos % frequency - (frequency / 2.0)) / frequency - 1.0));
@@ -36,5 +49,9 @@ public abstract class WaveFunctions {
 
     public static short sawtoothWave(int pos, double frequency, double amplitude) {
         return (short) (amplitude * Short.MAX_VALUE * (2.0 * ((pos * frequency / ModularSynths.SAMPLE_RATE) % 1.0)) - 1.0);
+    }
+
+    public static short amplitude(double value, double amount) {
+        return (short) (amount * Short.MAX_VALUE * value);
     }
 }

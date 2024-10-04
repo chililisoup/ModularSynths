@@ -1,7 +1,27 @@
 {
   "variants": {
-    "": {
+    "facing=down": {
+      "model": "modularsynths:block/speaker",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "modularsynths:block/speaker",
+      "y": 90
+    },
+    "facing=north": {
       "model": "modularsynths:block/speaker"
+    },
+    "facing=south": {
+      "model": "modularsynths:block/speaker",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "modularsynths:block/speaker",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "modularsynths:block/speaker",
+      "y": 270
     }
   }
 }

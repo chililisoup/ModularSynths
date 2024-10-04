@@ -18,7 +18,8 @@ public class ModularSynths {
 	// grab from config
 	public static final float SAMPLE_RATE = 44100; // 44.1 kHz
 	public static final int SAMPLE_BUFFER_SIZE = 1024; // ~23.22ms delay (1000/(rate/buffer_size))
-	public static final int MAX_DEPTH = 64; // how many synths can be chained into an output
+	public static final int MAX_SYNTH_DEPTH = 64; // how many synths can be chained into an output
+	public static final int MAX_SEARCH_DEPTH = 256; // how long one cable can be
 
 	public static void init() {
 		ModCreativeTabs.init();

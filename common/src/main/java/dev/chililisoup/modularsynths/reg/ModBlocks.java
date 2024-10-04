@@ -4,7 +4,10 @@ import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.CableBlock;
+import dev.chililisoup.modularsynths.block.PitchBlock;
 import dev.chililisoup.modularsynths.block.SpeakerBlock;
+import dev.chililisoup.modularsynths.block.WaveBlock;
+import dev.chililisoup.modularsynths.util.WaveType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -25,6 +28,11 @@ public class ModBlocks {
     private static void addBlocks() {
         new ModBlock("cable", () -> new CableBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("speaker", () -> new SpeakerBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("sine_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.SINE)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("square_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.SQUARE)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("triangle_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.TRIANGLE)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("sawtooth_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.SAWTOOTH)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("pitch_module", () -> new PitchBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
     }
 
     public static void init() {
@@ -47,7 +55,7 @@ public class ModBlocks {
         BlockItem get(Block block, Item.Properties props);
     }
 
-    private static class ModBlock {
+    private final static class ModBlock {
         private final String id;
         private final Supplier<? extends Block> blockFactory;
         private ItemFactory itemFactory = BlockItem::new;
@@ -66,24 +74,24 @@ public class ModBlocks {
             this(id, () -> new Block(props));
         }
 
-        final void set(RegistrySupplier<? extends Block> block) {
+        void set(RegistrySupplier<? extends Block> block) {
             this.block = block;
         }
 
-        final Block get() {
+        Block get() {
             return block.get();
         }
 
-        final BlockItem getItem(Block block) {
+        BlockItem getItem(Block block) {
             return itemFactory.get(block, itemProperties);
         }
 
-        final ModBlock itemFactory(ItemFactory factory) {
+        ModBlock itemFactory(ItemFactory factory) {
             itemFactory = factory;
             return this;
         }
 
-        final ModBlock creativeTabs(CreativeModeTab... tabs) {
+        ModBlock creativeTabs(CreativeModeTab... tabs) {
             Arrays.stream(tabs).forEach(itemProperties::arch$tab);
             return this;
         }

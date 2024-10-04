@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "#base",
+    "east": "#base",
+    "north": "modularsynths:block/module_output",
+    "particle": "#base",
+    "south": "#base",
+    "up": "#base",
+    "west": "#base"
+  }
+}

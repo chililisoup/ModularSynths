@@ -1,0 +1,6 @@
+{
+  "parent": "modularsynths:block/pitch_module/base",
+  "textures": {
+    "base": "modularsynths:block/pitch_module_10"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "modularsynths:block/base_wave_module",
+  "textures": {
+    "base": "modularsynths:block/sawtooth_wave_module"
+  }
+}

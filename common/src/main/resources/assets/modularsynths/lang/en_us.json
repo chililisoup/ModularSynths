@@ -1,5 +1,13 @@
 {
   "category.modularsynths.main": "Modular Synths",
+
   "block.modularsynths.cable": "Cable",
-  "block.modularsynths.speaker": "Speaker"
+  "block.modularsynths.speaker": "Speaker",
+
+  "block.modularsynths.sine_wave_module": "Sine Wave Module",
+  "block.modularsynths.square_wave_module": "Square Wave Module",
+  "block.modularsynths.triangle_wave_module": "Triangle Wave Module",
+  "block.modularsynths.sawtooth_wave_module": "Sawtooth Wave Module",
+
+  "block.modularsynths.pitch_module": "Pitch Module"
 }
