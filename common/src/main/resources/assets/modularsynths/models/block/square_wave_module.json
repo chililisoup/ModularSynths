@@ -1,5 +1,5 @@
 {
-  "parent": "modularsynths:block/base_wave_module",
+  "parent": "modularsynths:block/base_module",
   "textures": {
     "base": "modularsynths:block/square_wave_module"
   }

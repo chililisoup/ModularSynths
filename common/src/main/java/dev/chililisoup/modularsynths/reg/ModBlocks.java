@@ -3,10 +3,8 @@ package dev.chililisoup.modularsynths.reg;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.CableBlock;
-import dev.chililisoup.modularsynths.block.PitchBlock;
-import dev.chililisoup.modularsynths.block.SpeakerBlock;
-import dev.chililisoup.modularsynths.block.WaveBlock;
+import dev.chililisoup.modularsynths.block.*;
+import dev.chililisoup.modularsynths.util.EffectType;
 import dev.chililisoup.modularsynths.util.WaveType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +31,9 @@ public class ModBlocks {
         new ModBlock("triangle_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.TRIANGLE)).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("sawtooth_wave_module", () -> new WaveBlock(BlockBehaviour.Properties.of(), WaveType.SAWTOOTH)).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("pitch_module", () -> new PitchBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("amp_effect_module", () -> new EffectBlock(BlockBehaviour.Properties.of(), EffectType.AMPLITUDE)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("lfo_module", () -> new LfoBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("dial", () -> new DialBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
     }
 
     public static void init() {

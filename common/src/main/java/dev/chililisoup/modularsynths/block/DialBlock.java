@@ -19,10 +19,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class PitchBlock extends SynthBlock {
+public class DialBlock extends SynthBlock {
     public static final IntegerProperty NOTE;
 
-    public PitchBlock(Properties properties) {
+    public DialBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(NOTE, 0));
     }
@@ -31,7 +31,7 @@ public class PitchBlock extends SynthBlock {
     @Environment(EnvType.CLIENT)
     public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
         short[] output = new short[size];
-        Arrays.fill(output, SynthesisFunctions.getShortFromNote(state.getValue(NOTE) + 57)); // F# to match vanilla note blocks
+        Arrays.fill(output, (short) ((((double) state.getValue(NOTE) - 12.0) / 12.0) * 32767.0));
         return output;
     }
 

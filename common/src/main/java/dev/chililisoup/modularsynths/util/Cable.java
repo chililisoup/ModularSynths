@@ -6,6 +6,7 @@ import dev.chililisoup.modularsynths.block.SynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
@@ -14,12 +15,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 
-public abstract class CableExplorer {
-    public static ArrayList<BlockPos> exploreFrom(BlockPos pos, Level level) {
+public abstract class Cable {
+    public static ArrayList<Connection> exploreFrom(BlockPos pos, Level level) {
         Direction[] directions;
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
         Context context;
+        ArrayList<Direction> positionDirections = new ArrayList<>();
         ArrayList<Long> positions = new ArrayList<>();
         ArrayList<Long> checkedPositions = new ArrayList<>();
 
@@ -38,16 +40,18 @@ public abstract class CableExplorer {
         for (Direction direction : directions) {
             BlockPos checkPos = pos.relative(direction);
             checkPosition(pos, checkPos, level, positions, checkedPositions, 0, context);
+
+            for (int i = positionDirections.size(); i < positions.size(); i++) {
+                positionDirections.add(direction);
+            }
         }
 
-        ArrayList<BlockPos> blockPositions = new ArrayList<>();
-        long thisPos = pos.asLong();
-        positions.forEach(longPos -> {
-            if (thisPos == longPos) return;
-            blockPositions.add(BlockPos.of(longPos));
-        });
+        ArrayList<Connection> connections = new ArrayList<>();
+        for (int i = 0; i < positions.size(); i++) {
+            connections.add(new Connection(BlockPos.of(positions.get(i)), positionDirections.get(i)));
+        }
 
-        return blockPositions;
+        return connections;
     }
 
     private static void checkPosition(BlockPos fromPos, BlockPos checkPos, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, int searchDepth, Context context) {
@@ -111,8 +115,8 @@ public abstract class CableExplorer {
     }
 
     public static void updateSynths(Level level, BlockPos pos) {
-        CableExplorer.exploreFrom(pos, level).forEach(blockPos -> {
-            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+        Cable.exploreFrom(pos, level).forEach(connection -> {
+            BlockEntity blockEntity = level.getBlockEntity(connection.position);
             if (!(blockEntity instanceof SynthBlockEntity)) return;
             ((SynthBlockEntity) blockEntity).findInputs(level);
         });
@@ -129,6 +133,34 @@ public abstract class CableExplorer {
         Context(boolean checkInput, boolean checkOutput) {
             this.checkInput = checkInput;
             this.checkOutput = checkOutput;
+        }
+    }
+
+    public static class Connection {
+        public final BlockPos position;
+        public final long longPos;
+        public final Direction direction;
+        public final int intDir;
+
+        public Connection(BlockPos position, Direction direction) {
+            this.position = position;
+            this.longPos = position.asLong();
+            this.direction = direction;
+            this.intDir = direction.get3DDataValue();
+        }
+
+        public Connection(long longPos, int intDir) {
+            this.position = BlockPos.of(longPos);
+            this.longPos = longPos;
+            this.direction = Direction.from3DDataValue(intDir);
+            this.intDir = intDir;
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag connectionTag = new CompoundTag();
+            connectionTag.putLong("pos", this.longPos);
+            connectionTag.putInt("dir", this.intDir);
+            return connectionTag;
         }
     }
 }

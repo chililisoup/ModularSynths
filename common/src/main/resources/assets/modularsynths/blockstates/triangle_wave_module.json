@@ -1,26 +1,26 @@
 {
   "variants": {
     "facing=down": {
-      "model": "modularsynths:block/sawtooth_wave_module",
+      "model": "modularsynths:block/triangle_wave_module",
       "x": 90
     },
     "facing=east": {
-      "model": "modularsynths:block/sawtooth_wave_module",
+      "model": "modularsynths:block/triangle_wave_module",
       "y": 90
     },
     "facing=north": {
-      "model": "modularsynths:block/sawtooth_wave_module"
+      "model": "modularsynths:block/triangle_wave_module"
     },
     "facing=south": {
-      "model": "modularsynths:block/sawtooth_wave_module",
+      "model": "modularsynths:block/triangle_wave_module",
       "y": 180
     },
     "facing=up": {
-      "model": "modularsynths:block/sawtooth_wave_module",
+      "model": "modularsynths:block/triangle_wave_module",
       "x": 270
     },
     "facing=west": {
-      "model": "modularsynths:block/sawtooth_wave_module",
+      "model": "modularsynths:block/triangle_wave_module",
       "y": 270
     }
   }

@@ -1,8 +1,13 @@
 package dev.chililisoup.modularsynths.util;
 
 import dev.chililisoup.modularsynths.ModularSynths;
+import net.minecraft.util.Mth;
 
 public abstract class SynthesisFunctions {
+    public static double remapShort(short value) {
+        return ((double) value + 32768.0) / 65535.0;
+    }
+
     private static double convertFrequency(double frequency) {
         return (2.0 * Math.PI * frequency) / ModularSynths.SAMPLE_RATE;
     }
@@ -20,7 +25,7 @@ public abstract class SynthesisFunctions {
     }
 
     public static double getFrequencyFromShort(short value) {
-        return getFrequencyFromNote(getNoteFromShort(value));
+        return Math.pow(2.0, ((32768.0 + (double) value) * (127.0 / 65535.0) - 72.0) / 12.0) * 440.0;
     }
 
     public static short sineWave(int pos, double frequency, double amplitude) {
@@ -51,7 +56,14 @@ public abstract class SynthesisFunctions {
         return (short) (amplitude * Short.MAX_VALUE * (2.0 * ((pos * frequency / ModularSynths.SAMPLE_RATE) % 1.0)) - 1.0);
     }
 
-    public static short amplitude(double value, double amount) {
-        return (short) (amount * Short.MAX_VALUE * value);
+    public static short[] amplitude(short[] outputStack, short[] controlStack) {
+        for (int i = 0; i < outputStack.length; i++) {
+            outputStack[i] = (short) Mth.clamp(
+                    Math.round((double) outputStack[i] * remapShort(controlStack[i])),
+                    Short.MIN_VALUE,
+                    Short.MAX_VALUE
+            );
+        }
+        return outputStack;
     }
 }

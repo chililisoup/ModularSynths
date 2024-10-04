@@ -9,13 +9,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 
-public class WaveBlock extends SynthBlock {
-    private final WaveType type;
+public class LfoBlock extends SynthBlock {
     private int samplePosition = 0;
 
-    public WaveBlock(Properties properties, WaveType type) {
+    public LfoBlock(Properties properties) {
         super(properties);
-        this.type = type;
     }
 
     @Override
@@ -24,7 +22,7 @@ public class WaveBlock extends SynthBlock {
         short[] outputStack = super.requestData(inputStack, size, state);
 
         for (int i = 0; i < size; i++) {
-            outputStack[i] = type.apply(i + samplePosition, SynthesisFunctions.getFrequencyFromShort(outputStack[i]), 0.33);
+            outputStack[i] = WaveType.SINE.apply(i + samplePosition, (((double) outputStack[i] + 32768.0) / 65535.0) * 5.0, 1);
         }
         this.samplePosition += size;
 

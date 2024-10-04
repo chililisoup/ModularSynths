@@ -16,8 +16,7 @@ public abstract class ChannelMixin {
             method = "attachBufferStream",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/mojang/blaze3d/audio/Channel;calculateBufferSize(Ljavax/sound/sampled/AudioFormat;I)I")
-    )
+                    target = "Lcom/mojang/blaze3d/audio/Channel;calculateBufferSize(Ljavax/sound/sampled/AudioFormat;I)I"))
     private int assignBufferSize(AudioFormat format, int sampleAmount, Operation<Integer> original) {
         if (format instanceof SynthesizedAudioFormat) {
             return ModularSynths.SAMPLE_BUFFER_SIZE * 2;

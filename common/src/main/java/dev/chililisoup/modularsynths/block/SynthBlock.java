@@ -1,11 +1,11 @@
 package dev.chililisoup.modularsynths.block;
 
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.util.CableExplorer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -18,14 +18,14 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+
 public abstract class SynthBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING;
 
     public SynthBlock(Properties properties) {
         super(properties);
-        BlockState defaultState = this.stateDefinition.any().setValue(FACING, Direction.NORTH);
-        setDefaultStates(defaultState);
-        this.registerDefaultState(defaultState);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -43,8 +43,20 @@ public abstract class SynthBlock extends BaseEntityBlock {
     }
 
     @Environment(EnvType.CLIENT)
-    public short[] requestData(short[] data, BlockState state) {
-        return data;
+    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
+        short[] outputStack = new short[size];
+
+        inputStack.forEach((direction, dataStack) -> {
+            for (int i = 0; i < size; i++) {
+                outputStack[i] = (short) Mth.clamp(
+                        (int) outputStack[i] + (int) dataStack[i],
+                        Short.MIN_VALUE,
+                        Short.MAX_VALUE
+                );
+            }
+        });
+
+        return outputStack;
     }
 
     @Environment(EnvType.CLIENT)
@@ -79,8 +91,6 @@ public abstract class SynthBlock extends BaseEntityBlock {
         builder.add(FACING);
         this.addBlockStates(builder);
     }
-
-    protected void setDefaultStates(BlockState state) {}
 
     protected void addBlockStates(StateDefinition.Builder<Block, BlockState> builder) {}
 

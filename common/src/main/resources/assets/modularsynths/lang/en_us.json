@@ -9,5 +9,7 @@
   "block.modularsynths.triangle_wave_module": "Triangle Wave Module",
   "block.modularsynths.sawtooth_wave_module": "Sawtooth Wave Module",
 
-  "block.modularsynths.pitch_module": "Pitch Module"
+  "block.modularsynths.pitch_module": "Pitch Module",
+
+  "block.modularsynths.amp_effect_module": "Amp Effect Module"
 }

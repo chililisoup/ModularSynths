@@ -3,7 +3,6 @@ package dev.chililisoup.modularsynths.client.synthesis;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ShortBuffer;
@@ -25,9 +24,5 @@ public class AudioStreamSupplier {
         shortBuffer.position(0);
 
         return shortBuffer;
-    }
-
-    public interface SoundBufferSupplier {
-        short[] get(BlockState state, int size);
     }
 }

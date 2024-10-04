@@ -1,6 +1,6 @@
 {
   "parent": "modularsynths:block/base_module",
   "textures": {
-    "base": "modularsynths:block/sine_wave_module"
+    "base": "modularsynths:block/amp_effect_module"
   }
 }

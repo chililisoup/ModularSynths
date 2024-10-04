@@ -15,6 +15,7 @@ import java.nio.ShortBuffer;
 public class SynthesizedAudioStream implements AudioStream {
     private final SynthesizedAudioFormat audioFormat;
     private final AudioStreamSupplier audioStreamSupplier;
+    private boolean isStreaming = true;
 
     public SynthesizedAudioStream(AudioStreamSupplier audioStreamSupplier) {
         this.audioFormat = new SynthesizedAudioFormat(ModularSynths.SAMPLE_RATE, 16, 1, true, false);
@@ -29,20 +30,24 @@ public class SynthesizedAudioStream implements AudioStream {
     @Override
     public @NotNull ByteBuffer read(int size) {
         ByteBuffer byteBuffer = BufferUtils.createByteBuffer(size);
+
         ShortBuffer shortBuffer = this.audioStreamSupplier.get(size / 2);
 
-        while (byteBuffer.hasRemaining() && shortBuffer.hasRemaining()) {
+        while (byteBuffer.hasRemaining() && shortBuffer.hasRemaining() && isStreaming) {
             short value = shortBuffer.get();
             // https://stackoverflow.com/questions/2188660/convert-short-to-byte-in-java
             byteBuffer.put((byte)(value & 0xff)); // little endian
             byteBuffer.put((byte)((value >> 8) & 0xff));
         }
 
-        shortBuffer.clear(); // unnecessary?
         return  byteBuffer.flip(); // dunno why but it *needs* to be flipped
     }
 
     @Override
     public void close() {
+    }
+
+    public void stopStreaming() {
+        this.isStreaming = false;
     }
 }

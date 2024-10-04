@@ -3,15 +3,15 @@ package dev.chililisoup.modularsynths.block.entity;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.SynthBlock;
 import dev.chililisoup.modularsynths.reg.ModBlockEntityTypes;
-import dev.chililisoup.modularsynths.util.CableExplorer;
+import dev.chililisoup.modularsynths.util.Cable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.nbt.*;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,9 +21,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class SynthBlockEntity extends BlockEntity {
-    private final ArrayList<BlockPos> inputBlocks = new ArrayList<>();
+    private final ArrayList<Cable.Connection> inputConnections = new ArrayList<>();
 
     public SynthBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntityTypes.SYNTH.get(), pos, blockState);
@@ -31,24 +33,37 @@ public class SynthBlockEntity extends BlockEntity {
 
     @Environment(EnvType.CLIENT)
     private short[] request(Level level, int size, int depth) {
-        short[] inputStack = new short[size];
+        HashMap<String, short[]> inputStack = new HashMap<>();
 
-        if (depth < ModularSynths.MAX_SYNTH_DEPTH && !this.inputBlocks.isEmpty()) {
-            this.inputBlocks.forEach(blockPos -> {
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+        if (depth < ModularSynths.MAX_SYNTH_DEPTH && !this.inputConnections.isEmpty()) {
+            this.inputConnections.forEach(connection -> {
+                BlockEntity blockEntity = level.getBlockEntity(connection.position);
                 if (!(blockEntity instanceof SynthBlockEntity)) return;
 
+                String direction = connection.direction.getName();
+
+                inputStack.putIfAbsent(direction, new short[size]);
+                short[] stack = inputStack.get(direction);
+
                 short[] input = ((SynthBlockEntity) blockEntity).request(level, size, depth + 1);
-                for (int i = 0; i < size; i++) {
-                    inputStack[i] += input[i]; // this might need to be checked to prevent rollover?
-                }
+                IntStream.range(0, size).forEach(i ->
+                        stack[i] = (short) Mth.clamp(
+                                (int) stack[i] + (int) input[i],
+                                Short.MIN_VALUE,
+                                Short.MAX_VALUE
+                        )
+                );
             });
         } else {
+            short[] defaultInput = new short[size];
+
             short inputFallback = ((SynthBlock) this.getBlockState().getBlock()).inputFallback();
-            if (inputFallback != 0) Arrays.fill(inputStack, inputFallback);
+            if (inputFallback != 0) Arrays.fill(defaultInput, inputFallback);
+
+            inputStack.put("self", defaultInput);
         }
 
-        return ((SynthBlock) this.getBlockState().getBlock()).requestData(inputStack, this.getBlockState());
+        return ((SynthBlock) this.getBlockState().getBlock()).requestData(inputStack, size, this.getBlockState());
     }
 
     @Environment(EnvType.CLIENT)
@@ -59,11 +74,11 @@ public class SynthBlockEntity extends BlockEntity {
     public void findInputs(Level level) {
         if (!((SynthBlock) this.getBlockState().getBlock()).acceptsInput()) return;
 
-        this.inputBlocks.clear();
-        this.inputBlocks.addAll(
-                CableExplorer.exploreFrom(this.getBlockPos(), level)
-                        .stream().filter(blockPos -> {
-                            Block block = level.getBlockState(blockPos).getBlock();
+        this.inputConnections.clear();
+        this.inputConnections.addAll(
+                Cable.exploreFrom(this.getBlockPos(), level)
+                        .stream().filter(connection -> {
+                            Block block = level.getBlockState(connection.position).getBlock();
                             if (!(block instanceof SynthBlock)) return false;
                             return ((SynthBlock) block).sendsOutput();
                         }).toList()
@@ -73,10 +88,10 @@ public class SynthBlockEntity extends BlockEntity {
     }
 
     private CompoundTag prepareUpdateTag(CompoundTag tag) {
-        tag.put("InputBlocks", new LongArrayTag(
-                inputBlocks.stream().mapToLong(BlockPos::asLong).toArray()
-        ));
+        ListTag savedConnections = new ListTag();
+        savedConnections.addAll(inputConnections.stream().map(Cable.Connection::toTag).toList());
 
+        tag.put("InputConnections", savedConnections);
         return tag;
     }
 
@@ -90,8 +105,11 @@ public class SynthBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
 
-        this.inputBlocks.clear();
-        this.inputBlocks.addAll(Arrays.stream(tag.getLongArray("InputBlocks")).mapToObj(BlockPos::of).toList());
+        this.inputConnections.clear();
+        this.inputConnections.addAll(tag.getList("InputConnections", 10).stream().map(connectionTag -> {
+            CompoundTag compoundTag = (CompoundTag) connectionTag;
+            return new Cable.Connection(compoundTag.getLong("pos"), compoundTag.getInt("dir"));
+        }).toList());
     }
 
     @Nullable
