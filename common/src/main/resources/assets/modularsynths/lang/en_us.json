@@ -8,8 +8,13 @@
   "block.modularsynths.square_wave_module": "Square Wave Module",
   "block.modularsynths.triangle_wave_module": "Triangle Wave Module",
   "block.modularsynths.sawtooth_wave_module": "Sawtooth Wave Module",
+  "block.modularsynths.noise_wave_module": "Noise Wave Module",
 
   "block.modularsynths.pitch_module": "Pitch Module",
+  "block.modularsynths.envelope_module": "Envelope Module",
+  "block.modularsynths.mono_midi_module": "Mono MIDI Module",
+  "block.modularsynths.poly_midi_module": "Poly MIDI Module",
 
-  "block.modularsynths.amp_effect_module": "Amp Effect Module"
+  "block.modularsynths.amp_effect_module": "Amp Effect Module",
+  "block.modularsynths.portamento_effect_module": "Portamento Effect Module"
 }

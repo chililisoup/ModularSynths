@@ -1,8 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
-import dev.chililisoup.modularsynths.client.synthesis.AudioStreamSupplier;
-import dev.chililisoup.modularsynths.client.synthesis.BaseSoundInstance;
-import dev.chililisoup.modularsynths.client.synthesis.SynthesizedAudioPlayer;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -19,8 +17,6 @@ import java.util.HashMap;
 
 public class SpeakerBlock extends SynthBlock {
     public static final BooleanProperty POWERED;
-
-    private BaseSoundInstance soundInstance;
 
     public SpeakerBlock(Properties properties) {
         super(properties);
@@ -51,34 +47,28 @@ public class SpeakerBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        return super.requestData(inputStack, size, state);
-    }
-
-    @Environment(EnvType.CLIENT)
-    public void beginAudioStream(Level level, BlockPos pos) {
-        this.soundInstance = SynthesizedAudioPlayer.playSound(
-                pos.getX(),
-                pos.getY(),
-                pos.getZ(),
-                new AudioStreamSupplier(level, pos)
-        );
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        return super.requestData(inputStack, outputDirection, size, state, blockEntity);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (this.soundInstance != null) this.soundInstance.stopStreaming();
+        if (level.isClientSide) {
+            SynthBlockEntity blockEntity = (SynthBlockEntity) level.getBlockEntity(pos);
+            if (blockEntity != null) blockEntity.endAudioStream();
+        }
+
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override
     public boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
         if (level.isClientSide) {
-            if (param == 1) this.beginAudioStream(level, pos);
-            else if (this.soundInstance != null) {
-                this.soundInstance.stopStreaming();
-                this.soundInstance = null;
-            }
+            SynthBlockEntity blockEntity = (SynthBlockEntity) level.getBlockEntity(pos);
+            if (blockEntity == null) return true;
+
+            if (param == 1) blockEntity.beginAudioStream();
+            else blockEntity.endAudioStream();
         }
 
         return true;

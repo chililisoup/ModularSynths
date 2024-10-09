@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,9 +30,9 @@ public class PitchBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        short[] output = new short[size];
-        Arrays.fill(output, SynthesisFunctions.getShortFromNote(state.getValue(NOTE) + 57)); // F# to match vanilla note blocks
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        double[] output = new double[size];
+        Arrays.fill(output, SynthesisFunctions.getDoubleFromNote(state.getValue(NOTE) + 57)); // F# to match vanilla note blocks
         return output;
     }
 

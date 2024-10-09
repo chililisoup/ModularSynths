@@ -9,11 +9,11 @@ public enum EffectType {
         this.effectFunction = effectFunction;
     }
 
-    public short[] apply(short[] outputStack, short[] controlStack) {
+    public double[] apply(double[] outputStack, double[] controlStack) {
         return this.effectFunction.get(outputStack, controlStack);
     }
 
     private interface EffectFunction {
-        short[] get(short[] outputStack, short[] controlStack);
+        double[] get(double[] outputStack, double[] controlStack);
     }
 }

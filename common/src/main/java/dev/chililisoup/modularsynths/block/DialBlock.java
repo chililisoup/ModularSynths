@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
-import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -29,9 +29,9 @@ public class DialBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        short[] output = new short[size];
-        Arrays.fill(output, (short) ((((double) state.getValue(NOTE) - 12.0) / 12.0) * 32767.0));
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        double[] output = new double[size];
+        Arrays.fill(output, (double) state.getValue(NOTE) / 24.0);
         return output;
     }
 

@@ -4,7 +4,8 @@ public enum WaveType {
     SINE (SynthesisFunctions::sineWave),
     SQUARE (SynthesisFunctions::squareWave),
     TRIANGLE (SynthesisFunctions::triangleWave),
-    SAWTOOTH (SynthesisFunctions::sawtoothWave);
+    SAWTOOTH (SynthesisFunctions::sawtoothWave),
+    NOISE (SynthesisFunctions::noiseWave);
 
     private final WaveFunction waveFunction;
 
@@ -12,11 +13,11 @@ public enum WaveType {
         this.waveFunction = waveFunction;
     }
 
-    public short apply(int pos, double frequency, double amplitude) {
-        return this.waveFunction.get(pos, frequency, amplitude);
+    public double apply(double pos) {
+        return this.waveFunction.get(pos);
     }
 
     private interface WaveFunction {
-        short get(int pos, double frequency, double amplitude);
+        double get(double pos);
     }
 }

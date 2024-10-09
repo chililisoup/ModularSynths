@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import dev.chililisoup.modularsynths.util.WaveType;
 import net.fabricmc.api.EnvType;
@@ -10,29 +11,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.HashMap;
 
 public class LfoBlock extends SynthBlock {
-    private int samplePosition = 0;
-
     public LfoBlock(Properties properties) {
         super(properties);
     }
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        short[] outputStack = super.requestData(inputStack, size, state);
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        double[] outputStack = super.requestData(inputStack, outputDirection, size, state, blockEntity);
+        double samplePosition = blockEntity.getSamplePosition();
 
         for (int i = 0; i < size; i++) {
-            outputStack[i] = WaveType.SINE.apply(i + samplePosition, (((double) outputStack[i] + 32768.0) / 65535.0) * 5.0, 1);
+            double frequency = outputStack[i] * 5.0;
+            outputStack[i] = WaveType.SINE.apply(samplePosition) / 4.0;
+            samplePosition += SynthesisFunctions.waveStep(frequency);
         }
-        this.samplePosition += size;
 
+        blockEntity.setSamplePosition(samplePosition % 1.0);
         return outputStack;
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public short inputFallback() {
-        return 4386; // short for note 72, A @ 440 Hz
     }
 
     @Override

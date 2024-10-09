@@ -1,11 +1,11 @@
 package dev.chililisoup.modularsynths.block;
 
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -43,25 +43,56 @@ public abstract class SynthBlock extends BaseEntityBlock {
     }
 
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        short[] outputStack = new short[size];
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        double[] outputStack = new double[size];
 
         inputStack.forEach((direction, dataStack) -> {
-            for (int i = 0; i < size; i++) {
-                outputStack[i] = (short) Mth.clamp(
-                        (int) outputStack[i] + (int) dataStack[i],
-                        Short.MIN_VALUE,
-                        Short.MAX_VALUE
-                );
-            }
+            for (int i = 0; i < size; i++) outputStack[i] += dataStack[i] / inputStack.size();
         });
 
         return outputStack;
     }
 
     @Environment(EnvType.CLIENT)
-    public short inputFallback() {
-        return 0;
+    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        HashMap<String, double[]> monoStack = new HashMap<>();
+
+        inputStackSet.forEach((direction, dataSet) ->
+                monoStack.put(direction, SynthesisFunctions.polyToMono(dataSet, size))
+        );
+
+        return new double[][]{this.requestData(monoStack, outputDirection, size, state, blockEntity)};
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getPolyCount(HashMap<String, double[][]> inputStackSet) {
+        final int[] polyCount = {1};
+
+        inputStackSet.forEach((dir, inputStack) -> {
+            if (inputStack.length > polyCount[0]) polyCount[0] = inputStack.length;
+        });
+
+        return polyCount[0];
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double[][] combinePolyStackSets(HashMap<String, double[][]> inputStackSet, int size) {
+        double[][] combinedStack = new double[getPolyCount(inputStackSet)][size];
+
+        inputStackSet.forEach((dir, inputStack) -> {
+            for (int i = 0; i < inputStack.length; i++) {
+                for (int j = 0; j < size; j++) {
+                    combinedStack[i][j] += inputStack[i][j] / inputStackSet.size();
+                }
+            }
+        });
+
+        return combinedStack;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double inputFallback() {
+        return 0.0;
     }
 
     public Direction[] getOutputs(BlockState state) {

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "modularsynths:block/midi_module",
+    "east": "modularsynths:block/module_note_output",
+    "north": "modularsynths:block/module_gate_output",
+    "particle": "modularsynths:block/midi_module",
+    "south": "modularsynths:block/midi_module",
+    "up": "modularsynths:block/midi_module",
+    "west": "modularsynths:block/module_velocity_output"
+  }
+}

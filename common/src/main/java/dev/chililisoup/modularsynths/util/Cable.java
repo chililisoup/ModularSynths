@@ -21,7 +21,8 @@ public abstract class Cable {
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
         Context context;
-        ArrayList<Direction> positionDirections = new ArrayList<>();
+        ArrayList<Direction> inputDirections = new ArrayList<>();
+        ArrayList<Direction> outputDirections = new ArrayList<>();
         ArrayList<Long> positions = new ArrayList<>();
         ArrayList<Long> checkedPositions = new ArrayList<>();
 
@@ -39,35 +40,36 @@ public abstract class Cable {
 
         for (Direction direction : directions) {
             BlockPos checkPos = pos.relative(direction);
-            checkPosition(pos, checkPos, level, positions, checkedPositions, 0, context);
+            checkPosition(pos, checkPos, direction, level, positions, checkedPositions, outputDirections, 0, context);
 
-            for (int i = positionDirections.size(); i < positions.size(); i++) {
-                positionDirections.add(direction);
+            for (int i = inputDirections.size(); i < positions.size(); i++) {
+                inputDirections.add(direction);
             }
         }
 
         ArrayList<Connection> connections = new ArrayList<>();
         for (int i = 0; i < positions.size(); i++) {
-            connections.add(new Connection(BlockPos.of(positions.get(i)), positionDirections.get(i)));
+            connections.add(new Connection(BlockPos.of(positions.get(i)), inputDirections.get(i), outputDirections.get(i)));
         }
 
         return connections;
     }
 
-    private static void checkPosition(BlockPos fromPos, BlockPos checkPos, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, int searchDepth, Context context) {
+    private static void checkPosition(BlockPos fromPos, BlockPos checkPos, Direction checkDirection, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, ArrayList<Direction> outputDirections, int searchDepth, Context context) {
         BlockState checkState = level.getBlockState(checkPos);
         Block checkBlock = checkState.getBlock();
 
         if (checkBlock instanceof CableBlock) {
             if (searchDepth < ModularSynths.MAX_SEARCH_DEPTH)
-                exploreAt(checkPos, level, positions, checkedPositions, searchDepth, context);
+                exploreAt(checkPos, level, positions, checkedPositions, outputDirections, searchDepth, context);
         } else if (canConnect(fromPos, checkPos, checkState, context)) {
             checkedPositions.add(checkPos.asLong());
             positions.add(checkPos.asLong());
+            outputDirections.add(checkDirection.getOpposite());
         }
     }
 
-    private static void exploreAt(BlockPos pos, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, int searchDepth, Context context) {
+    private static void exploreAt(BlockPos pos, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, ArrayList<Direction> outputDirections, int searchDepth, Context context) {
         for (Direction direction : filterDirections(level.getBlockState(pos))) {
             BlockPos checkPos = pos.relative(direction);
 
@@ -75,7 +77,7 @@ public abstract class Cable {
             if (checkedPositions.contains(longPos)) continue;
 
             checkedPositions.add(longPos);
-            checkPosition(pos, checkPos, level, positions, checkedPositions, searchDepth + 1, context);
+            checkPosition(pos, checkPos, direction, level, positions, checkedPositions, outputDirections, searchDepth + 1, context);
         }
     }
 
@@ -139,27 +141,34 @@ public abstract class Cable {
     public static class Connection {
         public final BlockPos position;
         public final long longPos;
-        public final Direction direction;
-        public final int intDir;
+        public final Direction inDirection;
+        public final int intInDir;
+        public final Direction outDirection;
+        public final int intOutDir;
 
-        public Connection(BlockPos position, Direction direction) {
+        public Connection(BlockPos position, Direction inDirection, Direction outDirection) {
             this.position = position;
             this.longPos = position.asLong();
-            this.direction = direction;
-            this.intDir = direction.get3DDataValue();
+            this.inDirection = inDirection;
+            this.intInDir = inDirection.get3DDataValue();
+            this.outDirection = outDirection;
+            this.intOutDir = outDirection.get3DDataValue();
         }
 
-        public Connection(long longPos, int intDir) {
+        public Connection(long longPos, int intInDir, int intOutDir) {
             this.position = BlockPos.of(longPos);
             this.longPos = longPos;
-            this.direction = Direction.from3DDataValue(intDir);
-            this.intDir = intDir;
+            this.inDirection = Direction.from3DDataValue(intInDir);
+            this.intInDir = intInDir;
+            this.outDirection = Direction.from3DDataValue(intOutDir);
+            this.intOutDir = intOutDir;
         }
 
         public CompoundTag toTag() {
             CompoundTag connectionTag = new CompoundTag();
             connectionTag.putLong("pos", this.longPos);
-            connectionTag.putInt("dir", this.intDir);
+            connectionTag.putInt("inDir", this.intInDir);
+            connectionTag.putInt("outDir", this.intOutDir);
             return connectionTag;
         }
     }

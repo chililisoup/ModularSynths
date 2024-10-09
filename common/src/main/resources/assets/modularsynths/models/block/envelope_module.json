@@ -1,0 +1,6 @@
+{
+  "parent": "modularsynths:block/base_module",
+  "textures": {
+    "base": "modularsynths:block/module_gate_input"
+  }
+}

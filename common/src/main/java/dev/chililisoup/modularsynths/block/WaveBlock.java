@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import dev.chililisoup.modularsynths.util.WaveType;
 import net.fabricmc.api.EnvType;
@@ -7,11 +8,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class WaveBlock extends SynthBlock {
     private final WaveType type;
-    private int samplePosition = 0;
 
     public WaveBlock(Properties properties, WaveType type) {
         super(properties);
@@ -20,21 +21,32 @@ public class WaveBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short[] requestData(HashMap<String, short[]> inputStack, int size, BlockState state) {
-        short[] outputStack = super.requestData(inputStack, size, state);
+    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+        double[][] outputStackSet = inputStackSet.values().iterator().next();
+        ArrayList<Double> samplePositions = blockEntity.getCustomDoubleData();
 
-        for (int i = 0; i < size; i++) {
-            outputStack[i] = type.apply(i + samplePosition, SynthesisFunctions.getFrequencyFromShort(outputStack[i]), 0.33);
+        for (int i = 0; i < outputStackSet.length; i++) {
+            double[] outputStack = outputStackSet[i];
+
+            if (samplePositions.size() <= i) samplePositions.add(0.0);
+            double samplePosition = samplePositions.get(i);
+
+            for (int j = 0; j < size; j++) {
+                double frequency = SynthesisFunctions.getFrequencyFromDouble(outputStack[j]);
+                outputStack[j] = this.type.apply(samplePosition) / 4.0;
+                samplePosition += SynthesisFunctions.waveStep(frequency);
+            }
+
+            samplePositions.set(i, samplePosition % 1.0);
         }
-        this.samplePosition += size;
 
-        return outputStack;
+        return outputStackSet;
     }
 
     @Override
     @Environment(EnvType.CLIENT)
-    public short inputFallback() {
-        return 4386; // short for note 72, A @ 440 Hz
+    public double inputFallback() {
+        return 0.125; // double for A @ 440 Hz
     }
 
     @Override
