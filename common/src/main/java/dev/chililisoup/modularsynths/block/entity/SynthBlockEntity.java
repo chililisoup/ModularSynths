@@ -40,6 +40,13 @@ public class SynthBlockEntity extends BlockEntity {
     }
 
     @Environment(EnvType.CLIENT)
+    private double[][] alignStackSets(double[][] smallStackSet, double[][] largeStackSet, int size) {
+        double[][] newStackSet = new double[largeStackSet.length][size];
+        System.arraycopy(smallStackSet, 0, newStackSet, 0, smallStackSet.length);
+        return newStackSet;
+    }
+
+    @Environment(EnvType.CLIENT)
     private double[][] request(int size, int depth, boolean beginning, Direction outputDirection) {
         HashMap<String, double[][]> inputStack = new HashMap<>();
         Level level = this.getLevel();
@@ -56,10 +63,11 @@ public class SynthBlockEntity extends BlockEntity {
                 double[][] dataStackSet = inputStack.get(direction);
 
                 if (dataStackSet.length < inputStackSet.length) {
-                    double[][] newStackSet = new double[inputStackSet.length][size];
-                    System.arraycopy(dataStackSet, 0, newStackSet, 0, dataStackSet.length);
+                    double[][] newStackSet = alignStackSets(dataStackSet, inputStackSet, size);
                     inputStack.put(direction, newStackSet);
                     dataStackSet = inputStackSet;
+                } else if (inputStackSet.length < dataStackSet.length) {
+                    inputStackSet = alignStackSets(dataStackSet, inputStackSet, size);
                 }
 
                 for (int i = 0; i < dataStackSet.length; i++) {
@@ -114,12 +122,12 @@ public class SynthBlockEntity extends BlockEntity {
         this.soundInstance = null;
     }
 
-    public void findInputs(Level level) {
+    public void findInputs(Level level, ArrayList<BlockPos> updatedPositions) {
         if (!((SynthBlock) this.getBlockState().getBlock()).acceptsInput()) return;
 
         this.inputConnections.clear();
         this.inputConnections.addAll(
-                Cable.exploreFrom(this.getBlockPos(), level)
+                Cable.exploreFrom(this.getBlockPos(), level, updatedPositions)
                         .stream().filter(connection -> {
                             Block block = level.getBlockState(connection.position).getBlock();
                             if (!(block instanceof SynthBlock)) return false;
@@ -128,6 +136,12 @@ public class SynthBlockEntity extends BlockEntity {
         );
 
         level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    public void findInputs(Level level) {
+        ArrayList<BlockPos> updatedPositions = new ArrayList<>();
+        updatedPositions.add(this.getBlockPos());
+        findInputs(level, updatedPositions);
     }
 
     @Environment(EnvType.CLIENT)

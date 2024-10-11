@@ -38,6 +38,14 @@ public class MidiInputScreen extends Screen {
         return this.midiInput.polyCount;
     }
 
+    public double getPitchBend() {
+        return this.midiInput.pitchBend;
+    }
+
+    public long getUpdateTime() {
+        return this.midiInput.getUpdateTime();
+    }
+
     @Override
     protected void init() {
         this.addRenderableWidget(new ImageWidget(192, 192, image));

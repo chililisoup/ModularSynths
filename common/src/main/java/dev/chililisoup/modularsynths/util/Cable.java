@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 
 public abstract class Cable {
-    public static ArrayList<Connection> exploreFrom(BlockPos pos, Level level) {
+    public static ArrayList<Connection> exploreFrom(BlockPos pos, Level level, ArrayList<BlockPos> updatedPositions) {
         Direction[] directions;
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
@@ -33,6 +33,20 @@ public abstract class Cable {
             directions = ((SynthBlock) block).getInputs(state);
             context = Context.INPUT;
             checkedPositions.add(pos.asLong());
+
+            for (Direction direction : ((SynthBlock) block).getOutputs(state)) {
+                BlockPos checkPos = pos.relative(direction);
+
+                if (updatedPositions.stream().anyMatch(checkPos::equals)) continue;
+                if (!canConnect(pos, checkPos, level.getBlockState(checkPos), Context.OUTPUT)) continue;
+
+                BlockEntity blockEntity = level.getBlockEntity(checkPos);
+                if (blockEntity instanceof SynthBlockEntity) {
+                    updatedPositions.add(checkPos);
+                    ((SynthBlockEntity) blockEntity).findInputs(level, updatedPositions);
+                }
+            }
+
         } else {
             directions = Direction.values();
             context = Context.ANY;
@@ -53,6 +67,12 @@ public abstract class Cable {
         }
 
         return connections;
+    }
+
+    public static ArrayList<Connection> exploreFrom(BlockPos pos, Level level) {
+        ArrayList<BlockPos> updatedPositions = new ArrayList<>();
+        updatedPositions.add(pos);
+        return exploreFrom(pos, level, updatedPositions);
     }
 
     private static void checkPosition(BlockPos fromPos, BlockPos checkPos, Direction checkDirection, Level level, ArrayList<Long> positions, ArrayList<Long> checkedPositions, ArrayList<Direction> outputDirections, int searchDepth, Context context) {
@@ -116,12 +136,19 @@ public abstract class Cable {
         return canConnect(from, to ,toState, Context.ANY);
     }
 
-    public static void updateSynths(Level level, BlockPos pos) {
-        Cable.exploreFrom(pos, level).forEach(connection -> {
+    public static void updateSynths(Level level, BlockPos checkPos, BlockPos pos) {
+        exploreFrom(checkPos, level).forEach(connection -> {
+            if (connection.position == pos) return;
+
             BlockEntity blockEntity = level.getBlockEntity(connection.position);
             if (!(blockEntity instanceof SynthBlockEntity)) return;
+
             ((SynthBlockEntity) blockEntity).findInputs(level);
         });
+    }
+
+    public static void updateSynths(Level level, BlockPos pos) {
+        updateSynths(level, pos, pos);
     }
 
     public enum Context {

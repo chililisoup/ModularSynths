@@ -7,8 +7,12 @@ import java.util.Random;
 public abstract class SynthesisFunctions {
     private static final Random random = new Random();
 
-    public static double getDoubleFromNote(int note) {
+    public static double getDoubleFromNote(double note) {
         return (1.0 / 64.0) * note - 1.0;
+    }
+
+    public static double getDoubleFromNote(int note) {
+        return getDoubleFromNote((double) note);
     }
 
     public static double getFrequencyFromDouble(double value) {
