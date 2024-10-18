@@ -2,6 +2,7 @@ package dev.chililisoup.modularsynths.reg;
 
 import dev.architectury.registry.registries.Registrar;
 import dev.chililisoup.modularsynths.ModularSynths;
+import dev.chililisoup.modularsynths.block.SynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class ModBlockEntityTypes {
@@ -16,8 +18,12 @@ public class ModBlockEntityTypes {
 
     public static Supplier<BlockEntityType<SynthBlockEntity>> SYNTH;
 
+    private static Block[] getSynths() {
+        return ModBlocks.getAll().stream().filter(block -> block instanceof SynthBlock).toList().toArray(new Block[]{});
+    }
+
     public static void init() {
-        SYNTH = addBlockEntityType("synth", SynthBlockEntity::new, ModBlocks.get("speaker"));
+        SYNTH = addBlockEntityType("synth", SynthBlockEntity::new, getSynths());
     }
 
     public static <T extends BlockEntity> Supplier<BlockEntityType<T>> addBlockEntityType(

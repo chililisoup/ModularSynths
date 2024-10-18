@@ -1,9 +1,12 @@
 package dev.chililisoup.modularsynths.block;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -106,6 +109,15 @@ public abstract class SynthBlock extends BaseEntityBlock {
     public abstract boolean sendsOutput();
 
     public abstract boolean acceptsInput();
+
+    @Environment(EnvType.CLIENT)
+    public void render(SynthBlockEntity blockEntity,
+                       float partialTick,
+                       PoseStack poseStack,
+                       MultiBufferSource buffer,
+                       int packedLight,
+                       int packedOverlay,
+                       BlockEntityRendererProvider.Context context) {}
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {

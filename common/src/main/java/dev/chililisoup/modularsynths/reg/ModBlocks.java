@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -39,6 +40,7 @@ public class ModBlocks {
         new ModBlock("envelope_module", () -> new EnvelopeBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("mono_midi_module", () -> new MonoMidiBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("poly_midi_module", () -> new PolyMidiBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("oscilloscope_module", () -> new OscilloscopeBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
     }
 
     public static void init() {
@@ -51,6 +53,10 @@ public class ModBlocks {
         RegistrySupplier<? extends Block> block = blocks.register(resourceLocation, modBlock.blockFactory);
         items.register(resourceLocation, () -> modBlock.getItem(block.get()));
         modBlock.set(block);
+    }
+
+    public static List<Block> getAll() {
+        return modBlocks.values().stream().map(ModBlock::get).toList();
     }
 
     public static Block get(String id) {

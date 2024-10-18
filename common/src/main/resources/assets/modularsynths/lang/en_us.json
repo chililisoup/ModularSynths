@@ -16,5 +16,7 @@
   "block.modularsynths.poly_midi_module": "Poly MIDI Module",
 
   "block.modularsynths.amp_effect_module": "Amp Effect Module",
-  "block.modularsynths.portamento_effect_module": "Portamento Effect Module"
+  "block.modularsynths.portamento_effect_module": "Portamento Effect Module",
+
+  "block.modularsynths.oscilloscope_module": "Oscilloscope Module"
 }

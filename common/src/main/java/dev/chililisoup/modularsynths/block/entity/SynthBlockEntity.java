@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.block.entity;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.SynthBlock;
 import dev.chililisoup.modularsynths.client.synthesis.AudioStreamSupplier;
@@ -9,6 +10,8 @@ import dev.chililisoup.modularsynths.reg.ModBlockEntityTypes;
 import dev.chililisoup.modularsynths.util.Cable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.*;
@@ -203,5 +206,11 @@ public class SynthBlockEntity extends BlockEntity {
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         return prepareUpdateTag(new CompoundTag());
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void render(float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, BlockEntityRendererProvider.Context context) {
+        if (this.level == null) return;
+        ((SynthBlock) this.getBlockState().getBlock()).render(this, partialTick, poseStack, buffer, packedLight, packedOverlay, context);
     }
 }
