@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "modularsynths:block/module_blank",
+    "east": "modularsynths:block/module_input",
+    "north": "modularsynths:block/oscilloscope_module",
+    "particle": "modularsynths:block/module_blank",
+    "south": "modularsynths:block/module_blank",
+    "up": "modularsynths:block/module_blank",
+    "west": "modularsynths:block/module_output"
+  }
+}

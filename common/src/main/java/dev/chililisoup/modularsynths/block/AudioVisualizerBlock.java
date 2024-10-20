@@ -15,14 +15,20 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Matrix4f;
+import org.jtransforms.fft.DoubleFFT_1D;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
-public class OscilloscopeBlock extends SynthBlock {
-    private static final int SAMPLES;
+public class AudioVisualizerBlock extends SynthBlock {
+    private static final DoubleFFT_1D DOUBLE_FFT = new DoubleFFT_1D(ModularSynths.SAMPLE_BUFFER_SIZE);
+    private static final int SIZE = 256 / ModularSynths.GRAPHICS_RENDER_SCALE;
+    private static final double EXP = Math.log(ModularSynths.SAMPLE_BUFFER_SIZE) / SIZE;
+    private static final int AVG_COUNT = (int) (ModularSynths.SAMPLE_RATE / (ModularSynths.SAMPLE_BUFFER_SIZE * 4));
+    private static final int SMOOTHING = 16 / ModularSynths.GRAPHICS_RENDER_SCALE;
 
-    public OscilloscopeBlock(Properties properties) {
+    public AudioVisualizerBlock(Properties properties) {
         super(properties);
     }
 
@@ -33,7 +39,13 @@ public class OscilloscopeBlock extends SynthBlock {
 
         ArrayList<double[]> savedStacks = blockEntity.getSavedStacks();
         if (savedStacks.isEmpty()) savedStacks.add(output);
-        else savedStacks.set(0, output);
+        else {
+            savedStacks.set(0, output);
+            if (savedStacks.size() > AVG_COUNT + 1) {
+                savedStacks.remove(AVG_COUNT + 1);
+                savedStacks.remove(1);
+            }
+        }
 
         return output;
     }
@@ -69,7 +81,44 @@ public class OscilloscopeBlock extends SynthBlock {
                        BlockEntityRendererProvider.Context context)
     {
         if (blockEntity.getSavedStacks().isEmpty()) return;
-        double[] data = blockEntity.getSavedStacks().get(0);
+        ArrayList<double[]> savedStacks = blockEntity.getSavedStacks();
+        double[] data;
+
+        if (savedStacks.size() > AVG_COUNT + 1) {
+            data = savedStacks.get(AVG_COUNT + 1);
+        } else {
+            double[] fftData = savedStacks.get(0).clone();
+            DOUBLE_FFT.realForward(fftData);
+            savedStacks.add(fftData);
+
+            if (savedStacks.size() == AVG_COUNT + 1) {
+                data = new double[SIZE];
+
+                double[] prev = new double[SMOOTHING];
+                Arrays.fill(prev, -1);
+
+                for (int i = 0; i < SIZE; i++) {
+                    int index = (int) Math.round(Math.exp(EXP * i) - 1);
+
+                    double val = 0.0;
+                    for (int j = 0; j < AVG_COUNT; j++) {
+                        val += savedStacks.get(j + 1)[index];
+                    }
+                    val = Math.log10(Math.abs(val / AVG_COUNT));
+
+                    data[i] = Mth.clamp(
+                            (Arrays.stream(prev).sum() + val) / (SMOOTHING + 1),
+                            -1,
+                            1
+                    ) / 2;
+
+                    for (int j = 1; j < SMOOTHING; j++) prev[j - 1] = prev[j];
+                    prev[SMOOTHING - 1] = val;
+                }
+
+                savedStacks.add(data);
+            } else return;
+        }
 
         Direction dir = blockEntity.getBlockState().getValue(BlockStateProperties.FACING);
         Vec3i norm = dir.getNormal();
@@ -87,20 +136,15 @@ public class OscilloscopeBlock extends SynthBlock {
         VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.debugLineStrip(1));
         Matrix4f matrix = poseStack.last().pose();
 
-        for (int i = 0; i < SAMPLES; i += ModularSynths.GRAPHICS_RENDER_SCALE) {
+        for (int i = 0; i < SIZE; i++) {
             vertexConsumer.vertex(
                     matrix,
-                    (float) i / SAMPLES - 0.5F,
-                    (float) Mth.clamp((data[i] + 1) / 2, 0, 1) - 0.5F,
+                    (float) i / SIZE - 0.5F,
+                    (float) data[i],
                     0
-            ).color(0F, 1F, 0F, 1F).endVertex();
+            ).color(1F, 1F, 0F, 1F).endVertex();
         }
 
         poseStack.popPose();
-    }
-
-    static {
-        int samples = Math.min((int) ModularSynths.SAMPLE_RATE / 150, ModularSynths.SAMPLE_BUFFER_SIZE);
-        SAMPLES = samples - (samples % ModularSynths.GRAPHICS_RENDER_SCALE);
     }
 }

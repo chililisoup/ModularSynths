@@ -20,7 +20,9 @@ public class PolyMidiBlock extends MonoMidiBlock {
     public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
         if (this.inputScreen == null) return new double[1][size];
 
-        double[][] outputStackSet = new double[this.inputScreen.getPolyCount()][size];
+        int polyCount = this.inputScreen.getPolyCount();
+
+        double[][] outputStackSet = new double[polyCount][size];
         long time = this.inputScreen.getUpdateTime();
 
         ArrayList<MidiInput.MidiNote> noteStack = this.inputScreen.getNoteStack();
@@ -29,7 +31,7 @@ public class PolyMidiBlock extends MonoMidiBlock {
         Direction face = state.getValue(FACING);
         double pitchBend = this.inputScreen.getPitchBend();
 
-        for (int i = 0; i < noteStack.size(); i++) {
+        for (int i = 0; i < Math.min(noteStack.size(), polyCount); i++) {
             this.writeOutput(outputStackSet[i], outputDirection, face, noteStack.get(i), pitchBend, time);
         }
 

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "modularsynths:block/low_pass_filter_module",
+    "east": "modularsynths:block/module_input",
+    "north": "modularsynths:block/low_pass_filter_module",
+    "particle": "modularsynths:block/low_pass_filter_module",
+    "south": "modularsynths:block/low_pass_filter_module",
+    "up": "modularsynths:block/low_pass_filter_module",
+    "west": "modularsynths:block/module_output"
+  }
+}

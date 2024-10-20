@@ -81,7 +81,7 @@ public class MidiInput {
                         }
                     }
 
-                    if (noteStack.size() > polyCount) noteStack.remove(0);
+                    while (noteStack.size() > polyCount) noteStack.remove(0);
 
                     break;
                 case ShortMessage.NOTE_OFF:

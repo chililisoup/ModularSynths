@@ -43,7 +43,7 @@ public abstract class SynthesisFunctions {
         return random.nextDouble();
     }
 
-    public static double noiseWave(double pos) {
+    public static double noiseWave(double ignoredPos) {
         return noiseWave();
     }
 

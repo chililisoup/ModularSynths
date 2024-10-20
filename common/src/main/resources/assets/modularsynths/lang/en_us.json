@@ -17,6 +17,9 @@
 
   "block.modularsynths.amp_effect_module": "Amp Effect Module",
   "block.modularsynths.portamento_effect_module": "Portamento Effect Module",
+  "block.modularsynths.low_pass_filter_module": "Low Pass Filter Module",
+  "block.modularsynths.high_pass_filter_module": "High Pass Filter Module",
 
-  "block.modularsynths.oscilloscope_module": "Oscilloscope Module"
+  "block.modularsynths.oscilloscope_module": "Oscilloscope Module",
+  "block.modularsynths.audio_visualizer_module": "Audio Visualizer Module"
 }

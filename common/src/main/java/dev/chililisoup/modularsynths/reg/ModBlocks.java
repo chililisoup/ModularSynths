@@ -35,12 +35,15 @@ public class ModBlocks {
         new ModBlock("pitch_module", () -> new PitchBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("amp_effect_module", () -> new EffectBlock(BlockBehaviour.Properties.of(), EffectType.AMPLITUDE)).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("portamento_effect_module", () -> new PortamentoBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("low_pass_filter_module", () -> new BasicFilterBlock(BlockBehaviour.Properties.of(), false)).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("high_pass_filter_module", () -> new BasicFilterBlock(BlockBehaviour.Properties.of(), true)).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("lfo_module", () -> new LfoBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("dial", () -> new DialBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("envelope_module", () -> new EnvelopeBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("mono_midi_module", () -> new MonoMidiBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("poly_midi_module", () -> new PolyMidiBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
         new ModBlock("oscilloscope_module", () -> new OscilloscopeBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
+        new ModBlock("audio_visualizer_module", () -> new AudioVisualizerBlock(BlockBehaviour.Properties.of())).creativeTabs(ModCreativeTabs.MAIN.get());
     }
 
     public static void init() {
