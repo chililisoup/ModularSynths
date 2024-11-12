@@ -88,9 +88,16 @@ public class AudioVisualizerBlock extends SynthBlock {
             data = savedStacks.get(AVG_COUNT + 1);
         } else {
             double[] fftData = savedStacks.get(0).clone();
+
+            for (int i = 0; i < fftData.length; i++) { // Smooths out data to reduce artifacts
+                fftData[i] *= -Math.exp((double) -i / 64) - Math.exp((double) (i - fftData.length) / 64) + 1;
+            }
+
             DOUBLE_FFT.realForward(fftData);
             savedStacks.add(fftData);
 
+            // Make this take the FFT of the last four instead of the average of the last four FFTs
+            // Or not, wouldn't that be 4x as expensive?
             if (savedStacks.size() == AVG_COUNT + 1) {
                 data = new double[SIZE];
 

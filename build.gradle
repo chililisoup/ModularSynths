@@ -12,6 +12,7 @@ subprojects {
 
     loom {
         silentMojangMappingsLicense()
+        accessWidenerPath = file("src/main/resources/modularsynths.accesswidener")
     }
 
     dependencies {

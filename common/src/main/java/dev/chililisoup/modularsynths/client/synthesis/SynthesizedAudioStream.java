@@ -15,7 +15,7 @@ import java.nio.ShortBuffer;
 public class SynthesizedAudioStream implements AudioStream {
     private final SynthesizedAudioFormat audioFormat;
     private final AudioStreamSupplier audioStreamSupplier;
-    private boolean isStreaming = true;
+    private boolean streaming = true;
 
     public SynthesizedAudioStream(AudioStreamSupplier audioStreamSupplier) {
         this.audioFormat = new SynthesizedAudioFormat(ModularSynths.SAMPLE_RATE, 16, 1, true, false);
@@ -33,7 +33,7 @@ public class SynthesizedAudioStream implements AudioStream {
 
         ShortBuffer shortBuffer = this.audioStreamSupplier.get(size / 2);
 
-        while (byteBuffer.hasRemaining() && shortBuffer.hasRemaining() && isStreaming) {
+        while (byteBuffer.hasRemaining() && shortBuffer.hasRemaining() && streaming) {
             short value = shortBuffer.get();
             // https://stackoverflow.com/questions/2188660/convert-short-to-byte-in-java
             byteBuffer.put((byte)(value & 0xff)); // little endian
@@ -44,10 +44,13 @@ public class SynthesizedAudioStream implements AudioStream {
     }
 
     @Override
-    public void close() {
+    public void close() { }
+
+    public boolean isStreaming() {
+        return this.streaming;
     }
 
     public void stopStreaming() {
-        this.isStreaming = false;
+        this.streaming = false;
     }
 }

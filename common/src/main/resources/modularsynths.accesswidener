@@ -1,0 +1,3 @@
+accessWidener v2 named
+accessible field com/mojang/blaze3d/audio/Channel stream Lnet/minecraft/client/sounds/AudioStream;
+accessible field com/mojang/blaze3d/audio/Channel initialized Ljava/util/concurrent/atomic/AtomicBoolean;
