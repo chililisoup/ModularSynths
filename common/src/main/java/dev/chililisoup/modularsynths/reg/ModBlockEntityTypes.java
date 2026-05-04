@@ -3,26 +3,33 @@ package dev.chililisoup.modularsynths.reg;
 import dev.architectury.registry.registries.Registrar;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.SynthBlockOld;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class ModBlockEntityTypes {
     private static final Registrar<BlockEntityType<?>> blockEntityTypes = ModularSynths.MANAGER.get().get(Registries.BLOCK_ENTITY_TYPE);
 
+    public static Supplier<BlockEntityType<SynthBlockEntityOld>> SYNTH_OLD;
     public static Supplier<BlockEntityType<SynthBlockEntity>> SYNTH;
+
+    private static Block[] getOldSynths() {
+        return ModBlocks.getAll().stream().filter(block -> block instanceof SynthBlockOld).toList().toArray(new Block[]{});
+    }
 
     private static Block[] getSynths() {
         return ModBlocks.getAll().stream().filter(block -> block instanceof SynthBlock).toList().toArray(new Block[]{});
     }
 
     public static void init() {
+        SYNTH_OLD = addBlockEntityType("synth_old", SynthBlockEntityOld::new, getOldSynths());
         SYNTH = addBlockEntityType("synth", SynthBlockEntity::new, getSynths());
     }
 

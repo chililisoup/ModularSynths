@@ -4,88 +4,68 @@ import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 public class EnvelopeBlock extends SynthBlock {
-    private static final double attack = 0.05 * ModularSynths.SAMPLE_RATE;
-    private static final double decay = 0.1 * ModularSynths.SAMPLE_RATE;
-    private static final double sustain = 0.8;
-    private static final double release = 0.2 * ModularSynths.SAMPLE_RATE;
-
     public EnvelopeBlock(Properties properties) {
         super(properties);
     }
 
     @Override
+    public Vec2[] getInputPositions() {
+        return new Vec2[]{
+                new Vec2(13F / 16F, 12F / 16F),
+                new Vec2(14F / 16F, 3F / 16F),
+                new Vec2(10F / 16F, 3F / 16F),
+                new Vec2(6F / 16F, 3F / 16F),
+                new Vec2(2F / 16F, 3F / 16F),
+                new Vec2(13F / 16F, 8F / 16F)
+        };
+    }
+
+    @Override
+    public Vec2[] getOutputPositions() {
+        return new Vec2[]{
+                new Vec2(3F / 16F, 12F / 16F)
+        };
+    }
+
+    @Override
     @Environment(EnvType.CLIENT)
-    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
-        final int polyCount = this.getPolyCount(inputStackSet);
-
-        double[][] outputStackSet = new double[polyCount][size];
-        double[][] controlStackSet = new double[polyCount][size];
-
-        inputStackSet.forEach((direction, dataStackSet) -> {
-            if (direction.equals("self")) return;
-
-            double[][] usedStackSet = Direction.byName(direction) == state.getValue(FACING).getOpposite() ? outputStackSet : controlStackSet;
-
-            for (int i = 0; i < usedStackSet.length; i++) {
-                for (int j = 0; j < size; j++) usedStackSet[i][j] += dataStackSet[i][j];
-            }
-        });
+    public double[] requestOutputData(double[][] inputStackSet, int size, int outputPort, BlockState state, SynthBlockEntity blockEntity) {
+        double[] outputStack = inputStackSet[0];
+        double[] controlStack = inputStackSet[5];
 
         ArrayList<Integer> envelopeData = blockEntity.getCustomIntData();
-        for (int i = envelopeData.size(); i < polyCount; i++) envelopeData.add(0);
+        if (envelopeData.isEmpty()) envelopeData.add(0);
+        int envelopePosition = envelopeData.get(0);
 
-        for (int i = 0; i < polyCount; i++) {
-            int envelopePosition = envelopeData.get(i);
+        for (int i = 0; i < size; i++) {
+            double attack = Math.abs(inputStackSet[1][i]) * ModularSynths.SAMPLE_RATE;
+            double decay = Math.abs(inputStackSet[2][i]) * ModularSynths.SAMPLE_RATE;
+            double sustain = Math.abs(inputStackSet[3][i]);
+            double release = Math.abs(inputStackSet[4][i]) * ModularSynths.SAMPLE_RATE;
 
-            for (int j = 0; j < size; j++) {
-                if (controlStackSet[i][j] > 0.5 && envelopePosition < 0) envelopePosition = 0;
-                if (controlStackSet[i][j] > 0.5 || envelopePosition < 0) envelopePosition++;
-                if (controlStackSet[i][j] < 0.5 && envelopePosition > 0) envelopePosition = (int) Math.round(-release);
+            if (controlStack[i] > 0.5 && envelopePosition < 0) envelopePosition = 0;
+            if (controlStack[i] > 0.5 || envelopePosition < 0) envelopePosition++;
+            if (controlStack[i] < 0.5 && envelopePosition > 0) envelopePosition = (int) Math.round(-release);
 
-                if (envelopePosition == 0) {
-                    outputStackSet[i][j] = 0;
-                } else if (envelopePosition < 0) {
-                    outputStackSet[i][j] *= (-envelopePosition * sustain) / release;
-                } else if (envelopePosition < attack) {
-                    outputStackSet[i][j] *= 1.0 - ((attack - envelopePosition) / attack);
-                } else if (envelopePosition < attack + decay)
-                    outputStackSet[i][j] *= ((decay - envelopePosition + attack) / decay) * (1.0 - sustain) + sustain;
-                else outputStackSet[i][j] *= sustain;
-            }
-
-            envelopeData.set(i, envelopePosition);
+            if (envelopePosition == 0) {
+                outputStack[i] = 0;
+            } else if (envelopePosition < 0) {
+                outputStack[i] *= (-envelopePosition * sustain) / release;
+            } else if (envelopePosition < attack) {
+                outputStack[i] *= 1.0 - ((attack - envelopePosition) / attack);
+            } else if (envelopePosition < attack + decay)
+                outputStack[i] *= ((decay - envelopePosition + attack) / decay) * (1.0 - sustain) + sustain;
+            else outputStack[i] *= sustain;
         }
 
-        return outputStackSet;
-    }
+        envelopeData.set(0, envelopePosition);
 
-    @Override
-    public Direction[] getOutputs(BlockState state) {
-        return new Direction[]{state.getValue(FACING)};
-    }
-
-    @Override
-    public Direction[] getInputs(BlockState state) {
-        return Arrays.stream(Direction.values()).filter(
-                direction -> direction != state.getValue(FACING)
-        ).toList().toArray(new Direction[0]);
-    }
-
-    @Override
-    public boolean sendsOutput() {
-        return true;
-    }
-
-    @Override
-    public boolean acceptsInput() {
-        return true;
+        return outputStack;
     }
 }

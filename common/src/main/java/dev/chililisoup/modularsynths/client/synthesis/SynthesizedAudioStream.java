@@ -40,7 +40,7 @@ public class SynthesizedAudioStream implements AudioStream {
             byteBuffer.put((byte)((value >> 8) & 0xff));
         }
 
-        return  byteBuffer.flip(); // dunno why but it *needs* to be flipped
+        return byteBuffer.flip(); // dunno why but it *needs* to be flipped
     }
 
     @Override

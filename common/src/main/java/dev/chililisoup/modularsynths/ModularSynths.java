@@ -2,9 +2,8 @@ package dev.chililisoup.modularsynths;
 
 import com.google.common.base.Suppliers;
 import dev.architectury.registry.registries.RegistrarManager;
-import dev.chililisoup.modularsynths.reg.ModBlockEntityTypes;
-import dev.chililisoup.modularsynths.reg.ModBlocks;
-import dev.chililisoup.modularsynths.reg.ModCreativeTabs;
+import dev.chililisoup.modularsynths.network.ServerboundPacketHandlers;
+import dev.chililisoup.modularsynths.reg.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,11 +19,14 @@ public class ModularSynths {
 	public static final int SAMPLE_BUFFER_SIZE = 1024; // ~23.22ms delay (1000/(rate/buffer_size))
 	public static final int MAX_SYNTH_DEPTH = 64; // how many synths can be chained into an output
 	public static final int MAX_SEARCH_DEPTH = 256; // how long one cable can be
-	public static final int GRAPHICS_RENDER_SCALE = 2; // Render work is divided by this amount
+	public static final int GRAPHICS_RENDER_SCALE = 2; // Render work is divided by this amount (higher number is less quality)
 
 	public static void init() {
 		ModCreativeTabs.init();
+		ModItems.init();
 		ModBlocks.init();
 		ModBlockEntityTypes.init();
+		ServerboundPacketHandlers.registerReceivers();
+		ModEventListeners.init();
 	}
 }

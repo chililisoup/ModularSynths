@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
-import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 
-public class BasicFilterBlock extends SynthBlock { // Placeholder, rewrite to use FFT
+public class BasicFilterBlock extends SynthBlockOld { // Placeholder, rewrite to use FFT
     private final boolean isHighPass;
 
     public BasicFilterBlock(Properties properties, boolean isHighPass) {
@@ -18,7 +18,7 @@ public class BasicFilterBlock extends SynthBlock { // Placeholder, rewrite to us
 
     @Override
     @Environment(EnvType.CLIENT)
-    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntityOld blockEntity) {
         double[] output = super.requestData(inputStack, outputDirection, size, state, blockEntity);
 
         double lastPoint = blockEntity.getSamplePosition();

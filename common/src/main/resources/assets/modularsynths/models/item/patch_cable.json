@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "modularsynths:item/patch_cable",
+    "layer1": "modularsynths:item/patch_cable_overlay"
+  }
+}

@@ -2,7 +2,6 @@ package dev.chililisoup.modularsynths.client.synthesis;
 
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import net.minecraft.util.Mth;
 import org.lwjgl.BufferUtils;
 
@@ -17,7 +16,7 @@ public class AudioStreamSupplier {
     }
 
     public ShortBuffer get(int size) {
-        double[] soundData = SynthesisFunctions.polyToMono(this.synthBlockEntity.request(size, beginning), size);
+        double[] soundData = this.synthBlockEntity.request(size, beginning);
         short[] shortData = new short[size];
         beginning = false;
 

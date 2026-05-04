@@ -3,7 +3,7 @@ package dev.chililisoup.modularsynths.block;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class AudioVisualizerBlock extends SynthBlock {
+public class AudioVisualizerBlock extends SynthBlockOld {
     private static final DoubleFFT_1D DOUBLE_FFT = new DoubleFFT_1D(ModularSynths.SAMPLE_BUFFER_SIZE);
     private static final int SIZE = 256 / ModularSynths.GRAPHICS_RENDER_SCALE;
     private static final double EXP = Math.log(ModularSynths.SAMPLE_BUFFER_SIZE) / SIZE;
@@ -34,7 +34,7 @@ public class AudioVisualizerBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntityOld blockEntity) {
         double[] output = super.requestData(inputStack, outputDirection, size, state, blockEntity);
 
         ArrayList<double[]> savedStacks = blockEntity.getSavedStacks();
@@ -72,7 +72,7 @@ public class AudioVisualizerBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public void render(SynthBlockEntity blockEntity,
+    public void render(SynthBlockEntityOld blockEntity,
                        float partialTick,
                        PoseStack poseStack,
                        MultiBufferSource buffer,

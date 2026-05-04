@@ -1,0 +1,143 @@
+package dev.chililisoup.modularsynths.block;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
+import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+
+public abstract class SynthBlockOld extends BaseEntityBlock {
+    public static final DirectionProperty FACING; // Change to ORIENTATION
+
+    public SynthBlockOld(Properties properties) {
+        super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        if (!level.isClientSide && !(oldState.getBlock() instanceof SynthBlockOld)) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof SynthBlockEntityOld) ((SynthBlockEntityOld) blockEntity).findInputs(level);
+        }
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new SynthBlockEntityOld(pos, state);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntityOld blockEntity) {
+        double[] outputStack = new double[size];
+
+        inputStack.forEach((direction, dataStack) -> {
+            for (int i = 0; i < size; i++) outputStack[i] += dataStack[i] / inputStack.size();
+        });
+
+        return outputStack;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntityOld blockEntity) {
+        HashMap<String, double[]> monoStack = new HashMap<>();
+
+        inputStackSet.forEach((direction, dataSet) ->
+                monoStack.put(direction, SynthesisFunctions.polyToMono(dataSet, size))
+        );
+
+        return new double[][]{this.requestData(monoStack, outputDirection, size, state, blockEntity)};
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getPolyCount(HashMap<String, double[][]> inputStackSet) {
+        final int[] polyCount = {1};
+
+        inputStackSet.forEach((dir, inputStack) -> {
+            if (inputStack.length > polyCount[0]) polyCount[0] = inputStack.length;
+        });
+
+        return polyCount[0];
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double[][] combinePolyStackSets(HashMap<String, double[][]> inputStackSet, int size) {
+        double[][] combinedStack = new double[getPolyCount(inputStackSet)][size];
+
+        inputStackSet.forEach((dir, inputStack) -> {
+            for (int i = 0; i < inputStack.length; i++) {
+                for (int j = 0; j < size; j++) {
+                    combinedStack[i][j] += inputStack[i][j] / inputStackSet.size();
+                }
+            }
+        });
+
+        return combinedStack;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public double inputFallback() {
+        return 0.0;
+    }
+
+    public Direction[] getOutputs(BlockState state) {
+        return new Direction[0];
+    }
+
+    public Direction[] getInputs(BlockState state) {
+        return new Direction[0];
+    }
+
+    public abstract boolean sendsOutput();
+
+    public abstract boolean acceptsInput();
+
+    @Environment(EnvType.CLIENT)
+    public void render(SynthBlockEntityOld blockEntity,
+                       float partialTick,
+                       PoseStack poseStack,
+                       MultiBufferSource buffer,
+                       int packedLight,
+                       int packedOverlay,
+                       BlockEntityRendererProvider.Context context) {}
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
+    }
+
+    @Override
+    public @NotNull RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Override
+    protected final void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+        this.addBlockStates(builder);
+    }
+
+    protected void addBlockStates(StateDefinition.Builder<Block, BlockState> builder) {}
+
+    static {
+        FACING = BlockStateProperties.FACING;
+    }
+}

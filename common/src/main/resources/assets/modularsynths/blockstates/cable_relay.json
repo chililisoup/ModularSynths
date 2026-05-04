@@ -1,0 +1,57 @@
+{
+  "variants": {
+    "orientation=down_east": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 90,
+      "y": 90
+    },
+    "orientation=down_north": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 90
+    },
+    "orientation=down_south": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 90,
+      "y": 180
+    },
+    "orientation=down_west": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 90,
+      "y": 270
+    },
+    "orientation=east_up": {
+      "model": "modularsynths:block/cable_relay",
+      "y": 90
+    },
+    "orientation=north_up": {
+      "model": "modularsynths:block/cable_relay"
+    },
+    "orientation=south_up": {
+      "model": "modularsynths:block/cable_relay",
+      "y": 180
+    },
+    "orientation=up_east": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 270,
+      "y": 270
+    },
+    "orientation=up_north": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 270,
+      "y": 180
+    },
+    "orientation=up_south": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 270
+    },
+    "orientation=up_west": {
+      "model": "modularsynths:block/cable_relay",
+      "x": 270,
+      "y": 90
+    },
+    "orientation=west_up": {
+      "model": "modularsynths:block/cable_relay",
+      "y": 270
+    }
+  }
+}

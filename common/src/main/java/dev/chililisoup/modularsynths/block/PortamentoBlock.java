@@ -4,12 +4,11 @@ import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class PortamentoBlock extends SynthBlock {
     public PortamentoBlock(Properties properties) {
@@ -17,20 +16,25 @@ public class PortamentoBlock extends SynthBlock {
     }
 
     @Override
+    public Vec2[] getInputPositions() {
+        return new Vec2[]{
+                new Vec2(13F / 16F, 11F / 16F),
+                new Vec2(13F / 16F, 5F / 16F)
+        };
+    }
+
+    @Override
+    public Vec2[] getOutputPositions() {
+        return new Vec2[]{
+                new Vec2(3F / 16F, 8F / 16F),
+        };
+    }
+
+    @Override
     @Environment(EnvType.CLIENT)
-    public double[] requestData(HashMap<String, double[]> inputStack, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
-        double[] outputStack = new double[size];
-        double[] controlStack = new double[size];
-
-        inputStack.forEach((direction, dataStack) -> {
-            if (direction.equals("self")) return;
-
-            double[] usedStack = Direction.byName(direction) == state.getValue(FACING).getOpposite() ? outputStack : controlStack;
-
-            for (int i = 0; i < size; i++) {
-                usedStack[i] = dataStack[i] + usedStack[i];
-            }
-        });
+    public double[] requestOutputData(double[][] inputStackSet, int size, int outputPort, BlockState state, SynthBlockEntity blockEntity) {
+        double[] outputStack = inputStackSet[0];
+        double[] controlStack = inputStackSet[1];
 
         ArrayList<Double> customData = blockEntity.getCustomDoubleData();
 
@@ -46,7 +50,7 @@ public class PortamentoBlock extends SynthBlock {
                 target = outputStack[i];
             }
 
-            double step = (target - from) / (Math.abs(controlStack[i]) * ModularSynths.SAMPLE_RATE);
+            double step = (target - from) / (Math.max(Math.abs(controlStack[i]), 0.01) * ModularSynths.SAMPLE_RATE);
             double oldValue = last;
             double newValue = oldValue + step;
 
@@ -67,27 +71,5 @@ public class PortamentoBlock extends SynthBlock {
         customData.set(1, target);
         customData.set(2, last);
         return outputStack;
-    }
-
-    @Override
-    public Direction[] getOutputs(BlockState state) {
-        return new Direction[]{state.getValue(FACING)};
-    }
-
-    @Override
-    public Direction[] getInputs(BlockState state) {
-        return Arrays.stream(Direction.values()).filter(
-                direction -> direction != state.getValue(FACING)
-        ).toList().toArray(new Direction[0]);
-    }
-
-    @Override
-    public boolean sendsOutput() {
-        return true;
-    }
-
-    @Override
-    public boolean acceptsInput() {
-        return true;
     }
 }

@@ -1,25 +1,22 @@
 {
   "category.modularsynths.main": "Modular Synths",
 
-  "block.modularsynths.cable": "Cable",
+  "block.modularsynths.synth_controller": "Synth Controller",
   "block.modularsynths.speaker": "Speaker",
+  "block.modularsynths.cable_relay": "Cable Relay",
+  "block.modularsynths.wave_source": "Wave Source",
+  "block.modularsynths.pitch_supplier": "Pitch Supplier",
+  "block.modularsynths.dial": "Dial",
+  "block.modularsynths.lfo": "LFO",
+  "block.modularsynths.amplifier": "Amplifier",
+  "block.modularsynths.envelope": "Envelope",
+  "block.modularsynths.inverter": "Inverter",
+  "block.modularsynths.pitch_shifter": "Pitch Shifter",
+  "block.modularsynths.portamento": "Portamento",
+  "block.modularsynths.mono_midi_input": "Mono MIDI Input",
+  "block.modularsynths.amplitude_display": "Amplitude Display",
+  "block.modularsynths.oscilloscope": "Oscilloscope",
+  "block.modularsynths.circular_oscilloscope": "Circular Oscilloscope",
 
-  "block.modularsynths.sine_wave_module": "Sine Wave Module",
-  "block.modularsynths.square_wave_module": "Square Wave Module",
-  "block.modularsynths.triangle_wave_module": "Triangle Wave Module",
-  "block.modularsynths.sawtooth_wave_module": "Sawtooth Wave Module",
-  "block.modularsynths.noise_wave_module": "Noise Wave Module",
-
-  "block.modularsynths.pitch_module": "Pitch Module",
-  "block.modularsynths.envelope_module": "Envelope Module",
-  "block.modularsynths.mono_midi_module": "Mono MIDI Module",
-  "block.modularsynths.poly_midi_module": "Poly MIDI Module",
-
-  "block.modularsynths.amp_effect_module": "Amp Effect Module",
-  "block.modularsynths.portamento_effect_module": "Portamento Effect Module",
-  "block.modularsynths.low_pass_filter_module": "Low Pass Filter Module",
-  "block.modularsynths.high_pass_filter_module": "High Pass Filter Module",
-
-  "block.modularsynths.oscilloscope_module": "Oscilloscope Module",
-  "block.modularsynths.audio_visualizer_module": "Audio Visualizer Module"
+  "item.modularsynths.patch_cable": "Patch Cable"
 }

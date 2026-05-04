@@ -2,6 +2,7 @@ package dev.chililisoup.modularsynths.client.reg;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.chililisoup.modularsynths.client.renderer.SynthBlockRenderer;
+import dev.chililisoup.modularsynths.client.renderer.SynthBlockOldRenderer;
 import dev.chililisoup.modularsynths.reg.ModBlockEntityTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -11,6 +12,7 @@ import java.util.function.Supplier;
 
 public class ModBlockEntityRenderers {
     public static void init() {
+        registerRenderer(ModBlockEntityTypes.SYNTH_OLD, SynthBlockOldRenderer::new);
         registerRenderer(ModBlockEntityTypes.SYNTH, SynthBlockRenderer::new);
     }
 

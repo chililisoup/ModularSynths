@@ -1,7 +1,8 @@
 package dev.chililisoup.modularsynths.util;
 
 public enum EffectType {
-    AMPLITUDE (SynthesisFunctions::amplitude);
+    AMPLITUDE (SynthesisFunctions::amplitude),
+    INVERT (SynthesisFunctions::invert);
 
     private final EffectType.EffectFunction effectFunction;
 

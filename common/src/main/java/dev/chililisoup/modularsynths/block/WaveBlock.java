@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
-import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import dev.chililisoup.modularsynths.util.WaveType;
 import net.fabricmc.api.EnvType;
@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class WaveBlock extends SynthBlock {
+public class WaveBlock extends SynthBlockOld {
     private final WaveType type;
 
     public WaveBlock(Properties properties, WaveType type) {
@@ -21,7 +21,7 @@ public class WaveBlock extends SynthBlock {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntity blockEntity) {
+    public double[][] requestPolyData(HashMap<String, double[][]> inputStackSet, Direction outputDirection, int size, BlockState state, SynthBlockEntityOld blockEntity) {
         double[][] outputStackSet = inputStackSet.values().iterator().next();
         ArrayList<Double> samplePositions = blockEntity.getCustomDoubleData();
 

@@ -37,7 +37,9 @@ processResources {
             mod_name               : rootProject.archives_name,
             mod_description        : rootProject.mod_description,
             mod_authors            : rootProject.mod_authors,
-            mod_license            : rootProject.mod_license
+            mod_license            : rootProject.mod_license,
+            mod_site               : rootProject.mod_site,
+            mod_issues             : rootProject.mod_issues
     ]
     inputs.properties replaceProperties
 

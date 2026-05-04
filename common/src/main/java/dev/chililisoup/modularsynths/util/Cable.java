@@ -2,8 +2,8 @@ package dev.chililisoup.modularsynths.util;
 
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.CableBlock;
-import dev.chililisoup.modularsynths.block.SynthBlock;
-import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.block.SynthBlockOld;
+import dev.chililisoup.modularsynths.block.entity.SynthBlockEntityOld;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,21 +29,21 @@ public abstract class Cable {
         if (block instanceof CableBlock) {
             directions = filterDirections(state);
             context = Context.ANY;
-        } else if (block instanceof SynthBlock) {
-            directions = ((SynthBlock) block).getInputs(state);
+        } else if (block instanceof SynthBlockOld) {
+            directions = ((SynthBlockOld) block).getInputs(state);
             context = Context.INPUT;
             checkedPositions.add(pos.asLong());
 
-            for (Direction direction : ((SynthBlock) block).getOutputs(state)) {
+            for (Direction direction : ((SynthBlockOld) block).getOutputs(state)) {
                 BlockPos checkPos = pos.relative(direction);
 
                 if (updatedPositions.stream().anyMatch(checkPos::equals)) continue;
                 if (!canConnect(pos, checkPos, level.getBlockState(checkPos), Context.OUTPUT)) continue;
 
                 BlockEntity blockEntity = level.getBlockEntity(checkPos);
-                if (blockEntity instanceof SynthBlockEntity) {
+                if (blockEntity instanceof SynthBlockEntityOld) {
                     updatedPositions.add(checkPos);
-                    ((SynthBlockEntity) blockEntity).findInputs(level, updatedPositions);
+                    ((SynthBlockEntityOld) blockEntity).findInputs(level, updatedPositions);
                 }
             }
 
@@ -115,16 +115,16 @@ public abstract class Cable {
     }
 
     public static boolean canConnect(BlockPos from, BlockPos to, BlockState toState, Context context) {
-        if (!(toState.getBlock() instanceof SynthBlock synthBlock)) return false;
+        if (!(toState.getBlock() instanceof SynthBlockOld synthBlockOld)) return false;
 
         if (context.checkInput) {
-            for (Direction direction : synthBlock.getInputs(toState)) {
+            for (Direction direction : synthBlockOld.getInputs(toState)) {
                 if (to.relative(direction).equals(from)) return true;
             }
         }
 
         if (context.checkOutput) {
-            for (Direction direction : synthBlock.getOutputs(toState)) {
+            for (Direction direction : synthBlockOld.getOutputs(toState)) {
                 if (to.relative(direction).equals(from)) return true;
             }
         }
@@ -141,9 +141,9 @@ public abstract class Cable {
             if (connection.position == pos) return;
 
             BlockEntity blockEntity = level.getBlockEntity(connection.position);
-            if (!(blockEntity instanceof SynthBlockEntity)) return;
+            if (!(blockEntity instanceof SynthBlockEntityOld)) return;
 
-            ((SynthBlockEntity) blockEntity).findInputs(level);
+            ((SynthBlockEntityOld) blockEntity).findInputs(level);
         });
     }
 
