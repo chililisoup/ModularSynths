@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [ "${mod_author_list}" ],
+  "contact": {
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${mod_license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [ "dev.chililisoup.modularsynths.ModularSynths" ],
+    "client": [ "dev.chililisoup.modularsynths.client.ModularSynthsClient" ],
+    "fabric-datagen": [ "dev.chililisoup.modularsynths.client.datagen.ModularSynthsDataGenerator" ]
+  },
+  "accessWidener" : "${mod_id}.classtweaker",
+  "mixins": [ "${mod_id}.mixins.json" ],
+  "depends": {
+    "minecraft": "${minecraft_range}",
+    "fabric-api": "*"
+  }
+}

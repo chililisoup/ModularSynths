@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.chililisoup.modularsynths.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "client.ChannelMixin",
+    "client.FeatureRenderDispatcherMixin",
+    "client.OrderedSubmitNodeCollectorMixin",
+    "client.SubmitNodeCollectionMixin",
+    "client.SubmitNodeStorageMixin"
+  ],
+  "mixins": [
+    "LivingEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

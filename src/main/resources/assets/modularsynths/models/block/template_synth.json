@@ -1,0 +1,19 @@
+{
+  "parent": "minecraft:block/cube_directional",
+  "textures": {
+    "down": "modularsynths:block/synth_side",
+    "east": "modularsynths:block/synth_side",
+    "south": "modularsynths:block/synth_side",
+    "up": "modularsynths:block/synth_side",
+    "west": "modularsynths:block/synth_side",
+    "north": "#texture",
+    "particle": "#texture"
+  },
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [ 0, 135, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.40, 0.40, 0.40 ]
+    }
+  }
+}

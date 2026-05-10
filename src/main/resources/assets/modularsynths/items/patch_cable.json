@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "modularsynths:item/patch_cable",
+    "tints": [{
+      "type": "minecraft:dye",
+      "default": -1
+    }]
+  }
+}
