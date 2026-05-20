@@ -1,7 +1,7 @@
 package dev.chililisoup.modularsynths.block.entity;
 
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.reg.ModBlockEntityTypes;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import dev.chililisoup.modularsynths.synthesis.SynthInputConnection;
@@ -28,7 +28,7 @@ public class SynthBlockEntity extends BlockEntity {
 
     public SynthBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntityTypes.SYNTH, pos, blockState);
-        if (blockState.getBlock() instanceof SynthBlock<?> synthBlock) {
+        if (blockState.getBlock() instanceof AbstractSynthBlock<?> synthBlock) {
             this.synth = synthBlock.newSynth(this);
         } else {
             ModularSynths.LOGGER.error("Created a synth block entity where there's not a synth block! {}", pos);

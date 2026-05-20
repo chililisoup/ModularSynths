@@ -1,17 +1,27 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
-import dev.chililisoup.modularsynths.ModularSynths;
+import dev.chililisoup.modularsynths.block.DialBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import dev.chililisoup.modularsynths.synthesis.InputSampleSource;
 import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
 import dev.chililisoup.modularsynths.synthesis.SynthGraph;
+import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 
-public class SinSynth extends AbstractSynth {
-    private double phase = 0.0;
+import java.util.Arrays;
 
-    public SinSynth(SynthBlockEntity synthBlockEntity) {
-        super(synthBlockEntity, 0, 1);
+public class NoteSupplierSynth extends AbstractSynth {
+    public NoteSupplierSynth(SynthBlockEntity synthBlockEntity) {
+        super(synthBlockEntity);
+    }
+
+    public int getNote() {
+        return this.synthBlockEntity.getBlockState().getValueOrElse(DialBlock.NOTE, 0);
+    }
+
+    private double getPitch() {
+        // +57 makes it start at F# to match vanilla note blocks
+        return SynthesisFunctions.getDoubleFromNote(this.getNote() + 57);
     }
 
     @Override
@@ -21,11 +31,7 @@ public class SinSynth extends AbstractSynth {
 
     private PolySampleSource process(InputSampleSource inputs, int size) {
         double[] samples = new double[size];
-        for (int i = 0; i < samples.length; i++)
-            samples[i] = Math.sin((this.phase + i) * 800.0 / ModularSynths.SAMPLE_RATE);
-
-        this.phase = (this.phase + size) % (Math.PI * ModularSynths.SAMPLE_RATE);
-
+        Arrays.fill(samples, this.getPitch());
         return new PolySampleSource(samples);
     }
 }

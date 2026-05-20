@@ -2,8 +2,9 @@ package dev.chililisoup.modularsynths.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
+import dev.chililisoup.modularsynths.client.reg.SynthModuleRenderers;
 import dev.chililisoup.modularsynths.client.renderer.feature.CableFeatureRenderState;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import net.fabricmc.api.EnvType;
@@ -36,7 +37,11 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
     public static final int BASE_COLOR = 0xffcccccc;
     public static final int REMOVE_COLOR = 0xfff72e40;
 
-    public SynthRenderer(BlockEntityRendererProvider.Context context) {}
+    private final BlockEntityRendererProvider.Context context;
+
+    public SynthRenderer(BlockEntityRendererProvider.Context context) {
+        this.context = context;
+    }
 
     @Override
     public void submit(
@@ -50,6 +55,12 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
                 submitNodeCollector.modularSynths$submitTranslucentCable(poseStack, cable);
             else submitNodeCollector.modularSynths$submitCable(poseStack, cable);
         });
+
+        if (state.moduleRendererSubmit != null) state.moduleRendererSubmit.submit(
+                poseStack,
+                submitNodeCollector,
+                camera
+        );
     }
 
     @Override
@@ -64,7 +75,12 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
 
         BlockState blockState = blockEntity.getBlockState();
         state.synth = blockEntity.synth;
-        state.orientation = blockState.getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
+        state.orientation = blockState.getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
+
+        AbstractSynthModuleRenderer<?, ?> moduleRenderer = SynthModuleRenderers.getRenderer(blockState);
+        if (moduleRenderer != null) state.moduleRendererSubmit = moduleRenderer.prepareSubmit(
+                state.synth, partialTicks, state.orientation, this.context
+        );
 
         Level level = blockEntity.getLevel();
         if (level == null) {
@@ -114,7 +130,7 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
             }
 
             BlockPos endPos = cableState.endBlock.relative(level.getBlockState(cableState.endBlock)
-                    .getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP).front()
+                    .getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP).front()
             );
             return new CableFeatureRenderState(
                     cableState,
@@ -141,18 +157,18 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
             SynthBlockEntity blockEntity = state.synth.synthBlockEntity;
             BlockPos blockPos = hitResult.getBlockPos();
             if (blockPos.equals(state.synth.synthBlockEntity.getBlockPos())) {
-                if (!(blockEntity.getBlockState().getBlock() instanceof SynthBlock<?> synthBlock))
+                if (!(blockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock))
                     return null;
 
-                Optional<Vec2> hitPos = SynthBlock.getHitPos(hitResult, state.orientation);
+                Optional<Vec2> hitPos = AbstractSynthBlock.getHitPos(hitResult, state.orientation);
                 if (hitPos.isEmpty()) return null;
 
-                int inPort = SynthBlock.hitPort(hitPos.get(), synthBlock.inputPositions());
+                int inPort = AbstractSynthBlock.hitPort(hitPos.get(), synthBlock.inputPositions());
                 if (inPort >= 0) return !state.synth.inputEmpty(inPort) ?
                         new CableSelection(blockPos, inPort, true) :
                         null;
 
-                int outPort = SynthBlock.hitPort(hitPos.get(), synthBlock.outputPositions());
+                int outPort = AbstractSynthBlock.hitPort(hitPos.get(), synthBlock.outputPositions());
                 return outPort >= 0 && !state.synth.outputEmpty(outPort) ?
                         new CableSelection(blockPos, outPort, false) :
                         null;
@@ -161,23 +177,23 @@ public class SynthRenderer implements BlockEntityRenderer<SynthBlockEntity, Synt
             if (!(level.getBlockEntity(blockPos) instanceof SynthBlockEntity otherBlockEntity))
                 return null;
 
-            if (!(otherBlockEntity.getBlockState().getBlock() instanceof SynthBlock<?> synthBlock))
+            if (!(otherBlockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock))
                 return null;
 
-            Optional<Vec2> hitPos = SynthBlock.getHitPos(
+            Optional<Vec2> hitPos = AbstractSynthBlock.getHitPos(
                     hitResult,
-                    otherBlockEntity.getBlockState().getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
+                    otherBlockEntity.getBlockState().getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
             );
             if (hitPos.isEmpty()) return null;
 
             AbstractSynth otherSynth = otherBlockEntity.synth;
 
-            int inPort = SynthBlock.hitPort(hitPos.get(), synthBlock.inputPositions());
+            int inPort = AbstractSynthBlock.hitPort(hitPos.get(), synthBlock.inputPositions());
             if (inPort >= 0) return !otherSynth.inputEmpty(inPort) ?
                     new CableSelection(blockPos, inPort, true) :
                     null;
 
-            int outPort = SynthBlock.hitPort(hitPos.get(), synthBlock.outputPositions());
+            int outPort = AbstractSynthBlock.hitPort(hitPos.get(), synthBlock.outputPositions());
             return outPort >= 0 && !otherSynth.outputEmpty(outPort) ?
                     new CableSelection(blockPos, outPort, false) :
                     null;

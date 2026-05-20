@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class SpeakerBlock extends SynthBlock<SynthSpeaker> {
+public class SpeakerBlock extends AbstractSynthBlock<SynthSpeaker> {
     private static final MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     private static final Vec2[] INPUT_POSITION = new Vec2[]{

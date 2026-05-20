@@ -3,7 +3,7 @@ package dev.chililisoup.modularsynths.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.client.reg.ModRenderTypes;
 import dev.chililisoup.modularsynths.reg.ModItems;
@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
-import static dev.chililisoup.modularsynths.block.SynthBlock.PORT_RADIUS;
+import static dev.chililisoup.modularsynths.block.AbstractSynthBlock.PORT_RADIUS;
 
 public final class CablePreviewRenderer {
     public static void submit(LevelRenderContext context) {
@@ -143,7 +143,7 @@ public final class CablePreviewRenderer {
         private static CableLine extract(Level level, ModularSynths.CableDraw cableDraw, BlockHitResult hitResult) {
             Vec2 portPos;
             BlockState blockState = level.getBlockState(cableDraw.pos());
-            if (blockState.getBlock() instanceof SynthBlock<?> synthBlock) {
+            if (blockState.getBlock() instanceof AbstractSynthBlock<?> synthBlock) {
                 Vec2[] portPositions = cableDraw.isInput() ?
                         synthBlock.inputPositions() :
                         synthBlock.outputPositions();
@@ -160,29 +160,29 @@ public final class CablePreviewRenderer {
                             portPos,
                             cableDraw.isInput() ? SynthRenderer.INPUT_COLOR : SynthRenderer.OUTPUT_COLOR,
                             false,
-                            blockState.getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
+                            blockState.getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
                     )
             );
 
             BlockPos blockPos = hitResult.getBlockPos();
             if (hitResult.getType() == HitResult.Type.MISS
                     || !(level.getBlockEntity(blockPos) instanceof SynthBlockEntity synthBlockEntity)
-                    || !(synthBlockEntity.getBlockState().getBlock() instanceof SynthBlock<?> synthBlock)
+                    || !(synthBlockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock)
             ) return fallback;
 
             FrontAndTop orientation = synthBlockEntity.getBlockState()
-                    .getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
-            Optional<Vec2> hitPos = SynthBlock.getHitPos(hitResult, orientation);
+                    .getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
+            Optional<Vec2> hitPos = AbstractSynthBlock.getHitPos(hitResult, orientation);
             if (hitPos.isEmpty()) return fallback;
 
             Vec2[] inputPositions = synthBlock.inputPositions();
-            int inPort = SynthBlock.hitPort(hitPos.get(), inputPositions);
+            int inPort = AbstractSynthBlock.hitPort(hitPos.get(), inputPositions);
             if (inPort >= 0) {
                 if (cableDraw.isInput()) return fallback;
 
                 return new CableLine(
                         SynthRenderer.INPUT_COLOR,
-                        SynthBlock.face3DPos(
+                        AbstractSynthBlock.face3DPos(
                                 inputPositions[inPort], orientation
                         ).add(new Vec3(blockPos)).toVector3f(),
                         fallback.portOverlay
@@ -190,11 +190,11 @@ public final class CablePreviewRenderer {
             }
 
             Vec2[] outputPositions = synthBlock.outputPositions();
-            int outPort = SynthBlock.hitPort(hitPos.get(), outputPositions);
+            int outPort = AbstractSynthBlock.hitPort(hitPos.get(), outputPositions);
             return outPort >= 0 && cableDraw.isInput() ?
                     new CableLine(
                             SynthRenderer.OUTPUT_COLOR,
-                            SynthBlock.face3DPos(
+                            AbstractSynthBlock.face3DPos(
                                     outputPositions[outPort], orientation
                             ).add(new Vec3(blockPos)).toVector3f(),
                             fallback.portOverlay
@@ -213,17 +213,17 @@ public final class CablePreviewRenderer {
                 return Optional.empty();
 
             BlockState blockState = synthBlockEntity.getBlockState();
-            if (!(blockState.getBlock() instanceof SynthBlock<?> synthBlock))
+            if (!(blockState.getBlock() instanceof AbstractSynthBlock<?> synthBlock))
                 return Optional.empty();
 
             FrontAndTop orientation = blockState
-                    .getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
-            Optional<Vec2> hitPos = SynthBlock.getHitPos(hitResult, orientation);
+                    .getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
+            Optional<Vec2> hitPos = AbstractSynthBlock.getHitPos(hitResult, orientation);
             if (hitPos.isEmpty()) return Optional.empty();
 
             boolean hasCable = player.getMainHandItem().is(ModItems.PATCH_CABLE);
             Vec2[] inputPositions = synthBlock.inputPositions();
-            int inPort = SynthBlock.hitPort(hitPos.get(), inputPositions);
+            int inPort = AbstractSynthBlock.hitPort(hitPos.get(), inputPositions);
             if (inPort >= 0) {
                 if (cableDraw != null && cableDraw.isInput())
                     return cableDraw.port() != inPort || !cableDraw.pos().equals(blockPos) ?
@@ -251,7 +251,7 @@ public final class CablePreviewRenderer {
             }
 
             Vec2[] outputPositions = synthBlock.outputPositions();
-            int outPort = SynthBlock.hitPort(hitPos.get(), outputPositions);
+            int outPort = AbstractSynthBlock.hitPort(hitPos.get(), outputPositions);
             if (outPort >= 0) {
                 if (cableDraw != null && !cableDraw.isInput())
                     return cableDraw.port() != outPort || !cableDraw.pos().equals(blockPos) ?

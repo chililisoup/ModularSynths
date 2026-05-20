@@ -8,7 +8,7 @@ public class SynthSpeaker extends AbstractSynth {
     private @Nullable SynthGraph graph = null;
 
     public SynthSpeaker(SynthBlockEntity synthBlockEntity) {
-        super(synthBlockEntity, 1, 0);
+        super(synthBlockEntity);
     }
 
     public short[] feed(int size) {

@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.core.FrontAndTop;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -14,4 +15,5 @@ public class SynthRenderState extends BlockEntityRenderState {
     public AbstractSynth synth;
     public FrontAndTop orientation;
     public List<CableFeatureRenderState> cables;
+    public @Nullable AbstractSynthModuleRenderer.ModuleRendererSubmit moduleRendererSubmit = null;
 }

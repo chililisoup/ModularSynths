@@ -1,9 +1,7 @@
 package dev.chililisoup.modularsynths.reg;
 
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.CableRelayBlock;
-import dev.chililisoup.modularsynths.block.SinBlock;
-import dev.chililisoup.modularsynths.block.SpeakerBlock;
+import dev.chililisoup.modularsynths.block.*;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,7 +19,9 @@ import java.util.function.Function;
 public final class ModBlocks {
     public static final Block SPEAKER = registerSynth("speaker", SpeakerBlock::new);
     public static final Block CABLE_RELAY = registerSynth("cable_relay", CableRelayBlock::new);
-    public static final Block SIN = registerSynth("sin", SinBlock::new);
+    public static final Block DIAL = registerSynth("dial", DialBlock::new);
+    public static final Block NOTE_SUPPLIER = registerSynth("note_supplier", NoteSupplierBlock::new);
+    public static final Block WAVE_SOURCE = registerSynth("wave_source", WaveSourceBlock::new);
 
     private static Block register(
             String name,

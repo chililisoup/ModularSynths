@@ -6,4 +6,8 @@ public record InputSampleSource(PolySampleSource[] inputSources) {
                 this.inputSources[input] :
                 new PolySampleSource(new double[][]{ new double[size] });
     }
+
+    public PolySampleSource get(int size) {
+        return this.get(0, size);
+    }
 }

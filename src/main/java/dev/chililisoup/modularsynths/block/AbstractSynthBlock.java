@@ -26,16 +26,16 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
-public abstract class SynthBlock<T extends AbstractSynth> extends BaseEntityBlock {
+public abstract class AbstractSynthBlock<T extends AbstractSynth> extends BaseEntityBlock {
     public static final float PORT_RADIUS = 0.0625F;
     public static final EnumProperty<FrontAndTop> ORIENTATION = BlockStateProperties.ORIENTATION;
 
     private final Class<T> synthClass;
 
     @Override
-    protected abstract @NonNull MapCodec<? extends SynthBlock<T>> codec();
+    protected abstract @NonNull MapCodec<? extends AbstractSynthBlock<T>> codec();
 
-    public SynthBlock(Properties properties, Class<T> synthClass) {
+    public AbstractSynthBlock(Properties properties, Class<T> synthClass) {
         super(properties);
         this.synthClass = synthClass;
     }
@@ -99,22 +99,37 @@ public abstract class SynthBlock<T extends AbstractSynth> extends BaseEntityBloc
         BlockHitResult hitResult = ModUtil.getHitResult(level, player);
         if (!hitResult.getBlockPos().equals(pos)) return false;
 
+        Optional<PortHit> portHit = getPortHit(state, orientation, hitResult);
+        if (portHit.isEmpty()) return false;
+
+        if (portHit.get().isInput) synth.popInputs(portHit.get().port, face);
+        else synth.popOutputs(portHit.get().port, face);
+        return true;
+    }
+
+    public static Optional<PortHit> getPortHit(AbstractSynthBlock<?> synthBlock, FrontAndTop orientation, BlockHitResult hitResult) {
         Optional<Vec2> hitPos = getHitPos(hitResult, orientation);
-        if (hitPos.isEmpty()) return false;
+        if (hitPos.isEmpty()) return Optional.empty();
 
-        int inPort = SynthBlock.hitPort(hitPos.get(), this.inputPositions());
-        if (inPort >= 0) {
-            if (!level.isClientSide()) synth.popInputs(inPort, face);
-            return true;
-        }
+        Vec2[] inputPositions = synthBlock.inputPositions();
+        int inPort = hitPort(hitPos.get(), inputPositions);
+        if (inPort >= 0) return Optional.of(
+                new PortHit(inPort, true, inputPositions[inPort], hitResult.getBlockPos(), orientation)
+        );
 
-        int outPort = SynthBlock.hitPort(hitPos.get(), this.outputPositions());
-        if (outPort >= 0) {
-            if (!level.isClientSide()) synth.popOutputs(outPort, face);
-            return true;
-        }
+        Vec2[] outputPositions = synthBlock.outputPositions();
+        int outPort = hitPort(hitPos.get(), outputPositions);
+        if (outPort >= 0) return Optional.of(
+                new PortHit(outPort, false, outputPositions[outPort], hitResult.getBlockPos(), orientation)
+        );
 
-        return false;
+        return Optional.empty();
+    }
+
+    public static Optional<PortHit> getPortHit(BlockState state, FrontAndTop orientation, BlockHitResult hitResult) {
+        return state.getBlock() instanceof AbstractSynthBlock<?> synthBlock ?
+                getPortHit(synthBlock, orientation, hitResult) :
+                Optional.empty();
     }
 
     public static int hitPort(Vec2 hitPos, Vec2[] ports) {
@@ -199,5 +214,11 @@ public abstract class SynthBlock<T extends AbstractSynth> extends BaseEntityBloc
             };
 
         return pos;
+    }
+
+    public record PortHit(int port, boolean isInput, Vec2 portPos, BlockPos pos, FrontAndTop orientation) {
+        public Vec3 get3DPortPos() {
+            return face3DPos(this.portPos, this.orientation).add(new Vec3(this.pos));
+        }
     }
 }

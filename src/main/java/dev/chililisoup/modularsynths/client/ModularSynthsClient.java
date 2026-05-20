@@ -11,6 +11,7 @@ public final class ModularSynthsClient implements ClientModInitializer {
     public void onInitializeClient() {
         ModRenderPipelines.init();
         ModBlockEntityRenderers.init();
+        SynthModuleRenderers.init();
         ModClientEventListeners.init();
     }
 }

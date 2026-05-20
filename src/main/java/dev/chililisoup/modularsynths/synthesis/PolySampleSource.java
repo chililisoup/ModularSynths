@@ -11,7 +11,7 @@ public record PolySampleSource(double[]... polySamples) {
                 channels = source.channels();
 
         double[][] merged = new double[channels][];
-        for (int channel = 1; channel < channels; channel++) {
+        for (int channel = 0; channel < channels; channel++) {
             double[] mergedSamples = new double[size];
             for (PolySampleSource source : sources) {
                 if (channel >= source.channels()) continue;

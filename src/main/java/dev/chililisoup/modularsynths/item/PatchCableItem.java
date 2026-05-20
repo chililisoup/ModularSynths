@@ -1,7 +1,7 @@
 package dev.chililisoup.modularsynths.item;
 
 import dev.chililisoup.modularsynths.ModularSynths;
-import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.SynthInputConnection;
 import net.minecraft.core.BlockPos;
@@ -20,8 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -105,32 +103,12 @@ public class PatchCableItem extends Item {
 
         BlockPos pos = hitResult.getBlockPos();
         BlockState blockState = level.getBlockState(pos);
-        if (!(blockState.getBlock() instanceof SynthBlock<?> synthBlock)) return null;
+        if (!(blockState.getBlock() instanceof AbstractSynthBlock<?> synthBlock)) return null;
 
-        FrontAndTop orientation = blockState.getValue(SynthBlock.ORIENTATION);
+        FrontAndTop orientation = blockState.getValue(AbstractSynthBlock.ORIENTATION);
         if (hitResult.getDirection() != orientation.front()) return null;
 
-        Optional<Vec2> hitPos = SynthBlock.getHitPos(hitResult, orientation);
-        if (hitPos.isEmpty()) return null;
-
-        Vec2[] inputPositions = synthBlock.inputPositions();
-        int inputPort = SynthBlock.hitPort(hitPos.get(), inputPositions);
-        if (inputPort >= 0) return new ModularSynths.CableDraw(
-                pos,
-                inputPort,
-                true,
-                SynthBlock.face3DPos(inputPositions[inputPort], orientation).add(new Vec3(pos))
-        );
-
-        Vec2[] outputPositions = synthBlock.outputPositions();
-        int outputPort = SynthBlock.hitPort(hitPos.get(), outputPositions);
-        if (outputPort >= 0) return new ModularSynths.CableDraw(
-                pos,
-                outputPort,
-                false,
-                SynthBlock.face3DPos(outputPositions[outputPort], orientation).add(new Vec3(pos))
-        );
-
-        return null;
+        Optional<AbstractSynthBlock.PortHit> portHit = AbstractSynthBlock.getPortHit(synthBlock, orientation, hitResult);
+        return portHit.map(ModularSynths.CableDraw::new).orElse(null);
     }
 }

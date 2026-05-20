@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths;
 
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.reg.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
@@ -73,6 +74,10 @@ public final class ModularSynths implements ModInitializer {
 
         public CableDraw(BlockPos pos, int port, boolean isInput, Vec3 portPos) {
             this(pos, port, isInput, portPos.toVector3f());
+        }
+
+        public CableDraw(AbstractSynthBlock.PortHit portHit) {
+            this(portHit.pos(), portHit.port(), portHit.isInput(), portHit.get3DPortPos());
         }
     }
 }

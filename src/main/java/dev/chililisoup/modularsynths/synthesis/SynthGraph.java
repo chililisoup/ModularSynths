@@ -80,9 +80,11 @@ public final class SynthGraph {
             int[] requiredPorts = synth.dependenciesFor(outPort);
             ModularSynths.LOGGER.info("Gathering {} depended upon ports", requiredPorts.length);
             NodeDependency[] dependencies = new NodeDependency[requiredPorts.length];
-            for (int port : requiredPorts) dependencies[port] = NodeDependency.of(
-                    nodes, synth, port, depth + 1
-            );
+            for (int i = 0; i < requiredPorts.length; i++) {
+                dependencies[i] = NodeDependency.of(
+                        nodes, synth, requiredPorts[i], depth + 1
+                );
+            }
 
             Node node = new Node(dependencies, synth.processorFor(outPort));
             nodes.put(nodeHash, node);

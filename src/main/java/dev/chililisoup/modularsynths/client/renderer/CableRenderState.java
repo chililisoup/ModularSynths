@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.client.renderer;
 
-import dev.chililisoup.modularsynths.block.SynthBlock;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import dev.chililisoup.modularsynths.synthesis.SynthInputConnection;
 import net.minecraft.core.BlockPos;
@@ -63,19 +63,19 @@ public class CableRenderState {
     private void extractCablePositions(AbstractSynth synth, SynthInputConnection connection) {
         FrontAndTop orientation = synth.synthBlockEntity
                 .getBlockState()
-                .getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
+                .getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP);
 
         AbstractSynth otherSynth = connection.synth();
         FrontAndTop otherOrientation = Optional.ofNullable(otherSynth)
                 .map(i -> i.synthBlockEntity
                         .getBlockState()
-                        .getValueOrElse(SynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
+                        .getValueOrElse(AbstractSynthBlock.ORIENTATION, FrontAndTop.NORTH_UP)
                 ).orElse(FrontAndTop.NORTH_UP);
 
-        Vec2[] inputPositions = synth.synthBlockEntity.getBlockState().getBlock() instanceof SynthBlock<?> synthBlock ?
+        Vec2[] inputPositions = synth.synthBlockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock ?
                 synthBlock.inputPositions() : new Vec2[0];
         Vec2[] outputPositions = otherSynth != null
-                && otherSynth.synthBlockEntity.getBlockState().getBlock() instanceof SynthBlock<?> synthBlock ?
+                && otherSynth.synthBlockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock ?
                 synthBlock.outputPositions() : new Vec2[0];
 
         Vec2 inputPosition = inputPositions.length > this.inPort ?
@@ -84,10 +84,10 @@ public class CableRenderState {
                 outputPositions[connection.outPort()] : new Vec2(0.5F, 0.5F);
 
         this.startBlock = synth.synthBlockEntity.getBlockPos();
-        this.cableStart = SynthBlock.face3DPos(inputPosition, orientation);
+        this.cableStart = AbstractSynthBlock.face3DPos(inputPosition, orientation);
 
         this.endBlock = connection.pos();
-        this.cableEnd = SynthBlock.face3DPos(outputPosition, otherOrientation)
+        this.cableEnd = AbstractSynthBlock.face3DPos(outputPosition, otherOrientation)
                 .add(Vec3.atLowerCornerOf(this.endBlock.subtract(this.startBlock)));
 
         this.cableStartNorm = Vec3.atLowerCornerOf(orientation.front().getUnitVec3i());

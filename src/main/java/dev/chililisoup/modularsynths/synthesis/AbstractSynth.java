@@ -3,6 +3,7 @@ package dev.chililisoup.modularsynths.synthesis;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.chililisoup.modularsynths.ModularSynths;
+import dev.chililisoup.modularsynths.block.AbstractSynthBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public abstract class AbstractSynth {
-    private static final SynthGraph.NodeProcessor DEFAULT_PROCESSOR = (i, size) -> i.get(0, size);
     public static final Codec<List<InPort>> INPUTS_CODEC = Codec.list(InPort.CODEC);
     public static final Codec<List<OutPort>> OUTPUTS_CODEC = Codec.list(OutPort.CODEC);
 
@@ -24,16 +24,22 @@ public abstract class AbstractSynth {
     protected final InPort[] inputs;
     protected final OutPort[] outputs;
 
-    public AbstractSynth(SynthBlockEntity synthBlockEntity, int inputs, int outputs) {
+    public AbstractSynth(SynthBlockEntity synthBlockEntity) {
+        int inputs;
+        int outputs;
+        if (synthBlockEntity.getBlockState().getBlock() instanceof AbstractSynthBlock<?> synthBlock) {
+            inputs = synthBlock.inputPositions().length;
+            outputs = synthBlock.outputPositions().length;
+        } else {
+            inputs = 0;
+            outputs = 0;
+        }
+
         this.synthBlockEntity = synthBlockEntity;
         this.inputs = new InPort[inputs];
         for (int i = 0; i < inputs; i++) this.inputs[i] = new InPort(new ArrayList<>());
         this.outputs = new OutPort[outputs];
         for (int i = 0; i < outputs; i++) this.outputs[i] = new OutPort(new ArrayList<>());
-    }
-
-    public AbstractSynth(SynthBlockEntity synthBlockEntity) {
-        this(synthBlockEntity, 0, 0);
     }
 
     public void stop() {}
@@ -43,7 +49,7 @@ public abstract class AbstractSynth {
     }
 
     public SynthGraph.NodeProcessor processorFor(int outPort) {
-        return DEFAULT_PROCESSOR;
+        return InputSampleSource::get;
     }
 
     public List<InPort> getInputList() {

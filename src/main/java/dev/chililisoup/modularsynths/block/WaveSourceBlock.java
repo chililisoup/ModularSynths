@@ -2,13 +2,12 @@ package dev.chililisoup.modularsynths.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.synthesis.SynthRelay;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import dev.chililisoup.modularsynths.synthesis.modules.WaveSourceSynth;
 import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.NonNull;
 
-public class CableRelayBlock extends AbstractSynthBlock<SynthRelay> {
-    private static final MapCodec<CableRelayBlock> CODEC = simpleCodec(CableRelayBlock::new);
+public class WaveSourceBlock extends AbstractSynthBlock<WaveSourceSynth> {
+    private static final MapCodec<WaveSourceBlock> CODEC = simpleCodec(WaveSourceBlock::new);
     private static final Vec2[] INPUT_POSITIONS = new Vec2[]{
             new Vec2(13F / 16F, 14F / 16F),
             new Vec2(13F / 16F, 10F / 16F),
@@ -23,17 +22,12 @@ public class CableRelayBlock extends AbstractSynthBlock<SynthRelay> {
     };
 
     @Override
-    protected @NonNull MapCodec<CableRelayBlock> codec() {
+    protected @NonNull MapCodec<WaveSourceBlock> codec() {
         return CODEC;
     }
 
-    public CableRelayBlock(BlockBehaviour.Properties properties) {
-        super(properties, SynthRelay.class);
-    }
-
-    @Override
-    public @NonNull SynthRelay newSynth(SynthBlockEntity synthBlockEntity) {
-        return new SynthRelay(synthBlockEntity);
+    public WaveSourceBlock(Properties properties) {
+        super(properties, WaveSourceSynth.class);
     }
 
     @Override
@@ -44,5 +38,10 @@ public class CableRelayBlock extends AbstractSynthBlock<SynthRelay> {
     @Override
     public Vec2[] outputPositions() {
         return OUTPUT_POSITIONS;
+    }
+
+    @Override
+    public @NonNull WaveSourceSynth newSynth(SynthBlockEntity synthBlockEntity) {
+        return new WaveSourceSynth(synthBlockEntity);
     }
 }
