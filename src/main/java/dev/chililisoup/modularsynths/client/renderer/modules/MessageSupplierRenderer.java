@@ -3,7 +3,7 @@ package dev.chililisoup.modularsynths.client.renderer.modules;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.chililisoup.modularsynths.client.renderer.AbstractSynthModuleRenderer;
 import dev.chililisoup.modularsynths.client.renderer.SynthModuleRenderState;
-import dev.chililisoup.modularsynths.synthesis.modules.DialSynth;
+import dev.chililisoup.modularsynths.synthesis.MessageSupplierSynth;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
@@ -15,14 +15,14 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 @Environment(EnvType.CLIENT)
-public class DialRenderer extends AbstractSynthModuleRenderer<DialSynth, DialRenderer.DialRenderState> {
-    public DialRenderer() {
-        super(DialSynth.class);
+public class MessageSupplierRenderer extends AbstractSynthModuleRenderer<MessageSupplierSynth, MessageSupplierRenderer.MessageRenderState> {
+    public MessageSupplierRenderer() {
+        super(MessageSupplierSynth.class);
     }
 
     @Override
     protected void submit(
-            DialRenderState state,
+            MessageRenderState state,
             PoseStack poseStack,
             SubmitNodeCollector submitNodeCollector,
             CameraRenderState camera,
@@ -35,9 +35,9 @@ public class DialRenderer extends AbstractSynthModuleRenderer<DialSynth, DialRen
         Font font = context.font();
         submitNodeCollector.submitText(
                 poseStack,
-                -font.width(state.text) / 2F,
+                -font.width(state.message) / 2F,
                 -12,
-                state.text,
+                state.message,
                 false,
                 Font.DisplayMode.POLYGON_OFFSET,
                 state.frontLightCoords,
@@ -50,17 +50,17 @@ public class DialRenderer extends AbstractSynthModuleRenderer<DialSynth, DialRen
     }
 
     @Override
-    protected void extractRenderState(DialSynth synth, DialRenderState state, float partialTicks, FrontAndTop orientation) {
+    protected void extractRenderState(MessageSupplierSynth synth, MessageRenderState state, float partialTicks, FrontAndTop orientation) {
         super.extractRenderState(synth, state, partialTicks, orientation);
-        state.text = FormattedCharSequence.forward(String.format("%.1f%%", synth.getValue() * 100), Style.EMPTY);
+        state.message = FormattedCharSequence.forward(synth.getMessage(), Style.EMPTY);
     }
 
     @Override
-    protected DialRenderState createRenderState() {
-        return new DialRenderState();
+    protected MessageRenderState createRenderState() {
+        return new MessageRenderState();
     }
 
-    public static class DialRenderState extends SynthModuleRenderState {
-        public FormattedCharSequence text;
+    public static class MessageRenderState extends SynthModuleRenderState {
+        public FormattedCharSequence message;
     }
 }

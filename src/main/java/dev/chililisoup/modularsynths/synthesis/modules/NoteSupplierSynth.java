@@ -2,17 +2,19 @@ package dev.chililisoup.modularsynths.synthesis.modules;
 
 import dev.chililisoup.modularsynths.block.DialBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
-import dev.chililisoup.modularsynths.synthesis.InputSampleSource;
-import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
-import dev.chililisoup.modularsynths.synthesis.SynthGraph;
+import dev.chililisoup.modularsynths.synthesis.*;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 
 import java.util.Arrays;
 
-public class NoteSupplierSynth extends AbstractSynth {
+public class NoteSupplierSynth extends MessageSupplierSynth {
     public NoteSupplierSynth(SynthBlockEntity synthBlockEntity) {
         super(synthBlockEntity);
+    }
+
+    @Override
+    public String getMessage() {
+        return SynthesisFunctions.getNoteName(this.getNote());
     }
 
     public int getNote() {

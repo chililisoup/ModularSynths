@@ -18,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.core.Vec3i;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -32,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 
 import static dev.chililisoup.modularsynths.block.AbstractSynthBlock.PORT_RADIUS;
+import static dev.chililisoup.modularsynths.util.ModUtil.HALF_ROOT_TWO;
 
 public final class CablePreviewRenderer {
     public static void submit(LevelRenderContext context) {
@@ -203,8 +203,6 @@ public final class CablePreviewRenderer {
     }
 
     private record PortOverlay(Vec2 pos, int color, boolean negative, FrontAndTop orientation) {
-        private static final float HALF_ROOT_TWO = Mth.SQRT_OF_TWO / 2F;
-
         private static Optional<PortOverlay> extract(
                 Level level, ModularSynths.@Nullable CableDraw cableDraw, LocalPlayer player, BlockHitResult hitResult
         ) {

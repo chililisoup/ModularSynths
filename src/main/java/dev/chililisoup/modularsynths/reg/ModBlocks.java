@@ -21,7 +21,10 @@ public final class ModBlocks {
     public static final Block CABLE_RELAY = registerSynth("cable_relay", CableRelayBlock::new);
     public static final Block DIAL = registerSynth("dial", DialBlock::new);
     public static final Block NOTE_SUPPLIER = registerSynth("note_supplier", NoteSupplierBlock::new);
+    public static final Block NOTE_SHIFTER = registerSynth("note_shifter", NoteShifterBlock::new);
     public static final Block WAVE_SOURCE = registerSynth("wave_source", WaveSourceBlock::new);
+    public static final Block AMP = registerSynth("amp", AmpBlock::new);
+    public static final Block MONITOR = registerSynth("monitor", MonitorBlock::new);
 
     private static Block register(
             String name,

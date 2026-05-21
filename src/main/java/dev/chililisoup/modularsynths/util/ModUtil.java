@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.util;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -12,6 +13,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import java.util.Optional;
 
 public final class ModUtil {
+    public static final float HALF_ROOT_TWO = Mth.SQRT_OF_TWO / 2F;
+    public static final double LOG_TWO = Math.log(2);
+
     public static BlockHitResult getHitResult(Level level, Player player, Vec3 eyePos, float xRot, float yRot) {
         return level.clip(new ClipContext(
                 eyePos,

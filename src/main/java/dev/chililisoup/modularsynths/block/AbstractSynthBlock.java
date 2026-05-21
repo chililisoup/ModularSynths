@@ -30,7 +30,7 @@ public abstract class AbstractSynthBlock<T extends AbstractSynth> extends BaseEn
     public static final float PORT_RADIUS = 0.0625F;
     public static final EnumProperty<FrontAndTop> ORIENTATION = BlockStateProperties.ORIENTATION;
 
-    private final Class<T> synthClass;
+    protected final Class<T> synthClass;
 
     @Override
     protected abstract @NonNull MapCodec<? extends AbstractSynthBlock<T>> codec();

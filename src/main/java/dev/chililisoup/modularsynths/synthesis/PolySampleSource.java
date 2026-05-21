@@ -15,7 +15,7 @@ public record PolySampleSource(double[]... polySamples) {
             double[] mergedSamples = new double[size];
             for (PolySampleSource source : sources) {
                 if (channel >= source.channels()) continue;
-                double[] samples = source.getFromChannel(channel, size);
+                double[] samples = source.polySamples[channel];
                 for (int i = 0; i < size; i++) mergedSamples[i] += samples[i];
             }
             merged[channel] = mergedSamples;
@@ -24,19 +24,30 @@ public record PolySampleSource(double[]... polySamples) {
         return new PolySampleSource(merged);
     }
 
+    public PolySampleSource copy() {
+        return new PolySampleSource(this.safePolySamples());
+    }
+
     public int channels() {
         return this.polySamples.length;
     }
 
-    public double[] getFromChannel(int channel, int size) {
+    public double[][] safePolySamples() {
+        double[][] polySamples = new double[this.polySamples.length][];
+        for (int i = 0; i < polySamples().length; i++)
+            polySamples[i] = this.polySamples[i].clone();
+        return polySamples;
+    }
+
+    public double[] channelSamples(int channel, int size) {
         return this.channels() > channel && channel >= 0 ?
-                this.polySamples[channel] :
+                this.polySamples[channel].clone() :
                 new double[size];
     }
 
     public double[] monoSamples(int size) {
         if (this.channels() < 1) return new double[size];
-        if (this.channels() == 1) return this.polySamples[0];
+        if (this.channels() == 1) return this.polySamples[0].clone();
 
         double[] monoSamples = new double[size];
         for (int i = 0; i < size; i++)

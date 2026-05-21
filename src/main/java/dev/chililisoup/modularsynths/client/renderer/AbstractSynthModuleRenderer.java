@@ -55,8 +55,8 @@ public abstract class AbstractSynthModuleRenderer<T extends AbstractSynth, S ext
         return (poseStack, submitNodeCollector, camera) -> this.submit(state, poseStack, submitNodeCollector, camera, context);
     }
 
-    public static void transformPoseStackToFront(PoseStack poseStack, FrontAndTop orientation) {
-        poseStack.translate(orientation.front().getUnitVec3().scale(0.5).add(0.5));
+    public static void transformPoseStackToFront(PoseStack poseStack, FrontAndTop orientation, double scale) {
+        poseStack.translate(orientation.front().getUnitVec3().scale(scale).add(0.5));
         poseStack.mulPose(orientation.front().getRotation());
         poseStack.mulPose(Direction.NORTH.getRotation());
 
@@ -65,6 +65,10 @@ public abstract class AbstractSynthModuleRenderer<T extends AbstractSynth, S ext
             int rot = (dir + 1) * 90;
             poseStack.mulPose(new Quaternionf().fromAxisAngleDeg(0, 0, dir, orientation.top().toYRot() + rot));
         }
+    }
+
+    public static void transformPoseStackToFront(PoseStack poseStack, FrontAndTop orientation) {
+        transformPoseStackToFront(poseStack, orientation, 0.5);
     }
 
     @FunctionalInterface

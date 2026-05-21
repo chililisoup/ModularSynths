@@ -3,8 +3,6 @@ package dev.chililisoup.modularsynths.util;
 import dev.chililisoup.modularsynths.ModularSynths;
 
 public final class SynthesisFunctions {
-    private static final double LOG_TWO = Math.log(2);
-
     public static double getDoubleFromNote(double note) {
         return note / 64.0 - 1.0;
     }
@@ -18,7 +16,7 @@ public final class SynthesisFunctions {
     }
 
     public static double normalizeFrequency(double frequency, double octave) {
-        return Math.pow(2.0, (Math.log(frequency) / LOG_TWO) % 1.0 + octave);
+        return Math.pow(2.0, (Math.log(frequency) / ModUtil.LOG_TWO) % 1.0 + octave);
     }
 
     public static String getNoteName(int note) {
@@ -37,8 +35,7 @@ public final class SynthesisFunctions {
             case 11, 23 -> "F";
             default -> String.valueOf(note);
         };
-        if (note > 11) text += " " + (1 + note / 12);
-        return text;
+        return note > 11 ? text + " " + (1 + note / 12) : text;
     }
 
     public static double waveStep(double frequency) {

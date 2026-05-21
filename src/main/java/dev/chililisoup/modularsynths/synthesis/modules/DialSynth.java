@@ -2,16 +2,18 @@ package dev.chililisoup.modularsynths.synthesis.modules;
 
 import dev.chililisoup.modularsynths.block.DialBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
-import dev.chililisoup.modularsynths.synthesis.InputSampleSource;
-import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
-import dev.chililisoup.modularsynths.synthesis.SynthGraph;
+import dev.chililisoup.modularsynths.synthesis.*;
 
 import java.util.Arrays;
 
-public class DialSynth extends AbstractSynth {
+public class DialSynth extends MessageSupplierSynth {
     public DialSynth(SynthBlockEntity synthBlockEntity) {
         super(synthBlockEntity);
+    }
+
+    @Override
+    public String getMessage() {
+        return String.format("%.1f%%", this.getValue() * 100);
     }
 
     public double getValue() {

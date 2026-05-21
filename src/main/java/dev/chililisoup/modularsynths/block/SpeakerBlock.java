@@ -21,9 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class SpeakerBlock extends AbstractSynthBlock<SynthSpeaker> {
     private static final MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    private static final Vec2[] INPUT_POSITION = new Vec2[]{
-            new Vec2(8F / 16F, 12F / 16F)
-    };
+    private static final Vec2[] INPUT_POSITION = new Vec2[]{new Vec2(8F / 16F, 12F / 16F)};
 
     @Override
     protected @NonNull MapCodec<SpeakerBlock> codec() {

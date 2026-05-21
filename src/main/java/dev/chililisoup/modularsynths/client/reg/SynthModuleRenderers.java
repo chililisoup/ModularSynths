@@ -1,8 +1,8 @@
 package dev.chililisoup.modularsynths.client.reg;
 
 import dev.chililisoup.modularsynths.client.renderer.AbstractSynthModuleRenderer;
-import dev.chililisoup.modularsynths.client.renderer.modules.DialRenderer;
-import dev.chililisoup.modularsynths.client.renderer.modules.NoteSupplierRenderer;
+import dev.chililisoup.modularsynths.client.renderer.modules.MessageSupplierRenderer;
+import dev.chililisoup.modularsynths.client.renderer.modules.MonitorRenderer;
 import dev.chililisoup.modularsynths.reg.ModBlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,8 +25,10 @@ public class SynthModuleRenderers {
     }
 
     static {
-        RENDERERS.put(ModBlocks.DIAL, new DialRenderer());
-        RENDERERS.put(ModBlocks.NOTE_SUPPLIER, new NoteSupplierRenderer());
+        RENDERERS.put(ModBlocks.DIAL, new MessageSupplierRenderer());
+        RENDERERS.put(ModBlocks.NOTE_SUPPLIER, new MessageSupplierRenderer());
+        RENDERERS.put(ModBlocks.NOTE_SHIFTER, new MessageSupplierRenderer());
+        RENDERERS.put(ModBlocks.MONITOR, new MonitorRenderer());
     }
 
     public static void init() {}
