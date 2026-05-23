@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
-import dev.chililisoup.modularsynths.block.DialBlock;
+import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
 
@@ -16,7 +16,7 @@ public class NoteShifterSynth extends MessageSupplierSynth {
     }
 
     public int getShift() {
-        return this.synthBlockEntity.getBlockState().getValueOrElse(DialBlock.NOTE, 0) - 12;
+        return this.synthBlockEntity.getBlockState().getValueOrElse(AbstractNoteHolderBlock.NOTE, 0) - 12;
     }
 
     @Override
@@ -31,8 +31,11 @@ public class NoteShifterSynth extends MessageSupplierSynth {
 
     private PolySampleSource process(InputSampleSource inputs, int size) {
         double shift = this.getShift() / 64.0;
-        double[] samples = inputs.get(size).monoSamples(size);
-        for (int i = 0; i < size; i++) samples[i] += shift;
-        return new PolySampleSource(samples);
+        double[][] polySamples = inputs.get(size).safePolySamples();
+
+        for (double[] samples : polySamples)
+            for (int i = 0; i < size; i++) samples[i] += shift;
+
+        return new PolySampleSource(polySamples);
     }
 }

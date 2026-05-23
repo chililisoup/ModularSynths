@@ -38,6 +38,7 @@ public abstract class AbstractSynthBlock<T extends AbstractSynth> extends BaseEn
     public AbstractSynthBlock(Properties properties, Class<T> synthClass) {
         super(properties);
         this.synthClass = synthClass;
+        this.registerDefaultState(this.stateDefinition.any().setValue(ORIENTATION, FrontAndTop.NORTH_UP));
     }
 
     public abstract @NonNull T newSynth(SynthBlockEntity synthBlockEntity);

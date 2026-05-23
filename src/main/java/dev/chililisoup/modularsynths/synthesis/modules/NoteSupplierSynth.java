@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
-import dev.chililisoup.modularsynths.block.DialBlock;
+import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
@@ -18,12 +18,12 @@ public class NoteSupplierSynth extends MessageSupplierSynth {
     }
 
     public int getNote() {
-        return this.synthBlockEntity.getBlockState().getValueOrElse(DialBlock.NOTE, 0);
+        return this.synthBlockEntity.getBlockState().getValueOrElse(AbstractNoteHolderBlock.NOTE, 0);
     }
 
     private double getPitch() {
-        // +57 makes it start at F# to match vanilla note blocks
-        return SynthesisFunctions.getDoubleFromNote(this.getNote() + 57);
+        // +45 makes it start at F# to match vanilla note blocks
+        return SynthesisFunctions.getDoubleFromNote(this.getNote() + 45);
     }
 
     @Override

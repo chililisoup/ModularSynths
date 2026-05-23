@@ -20,19 +20,19 @@ public final class SynthesisFunctions {
     }
 
     public static String getNoteName(int note) {
-        String text = switch (note) {
-            case 0, 12, 24 -> "F♯/G♭";
-            case 1, 13 -> "G";
-            case 2, 14 -> "G♯/A♭";
-            case 3, 15 -> "A";
-            case 4, 16 -> "A♯/B♭";
-            case 5, 17 -> "B";
-            case 6, 18 -> "C";
-            case 7, 19 -> "C♯/D♭";
-            case 8, 20 -> "D";
-            case 9, 21 -> "D♯/E♭";
-            case 10, 22 -> "E";
-            case 11, 23 -> "F";
+        String text = switch (note % 12) {
+            case 0 -> "F♯/G♭";
+            case 1 -> "G";
+            case 2 -> "G♯/A♭";
+            case 3 -> "A";
+            case 4 -> "A♯/B♭";
+            case 5 -> "B";
+            case 6 -> "C";
+            case 7 -> "C♯/D♭";
+            case 8 -> "D";
+            case 9 -> "D♯/E♭";
+            case 10 -> "E";
+            case 11 -> "F";
             default -> String.valueOf(note);
         };
         return note > 11 ? text + " " + (1 + note / 12) : text;

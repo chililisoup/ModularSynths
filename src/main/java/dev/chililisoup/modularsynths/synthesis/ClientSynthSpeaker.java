@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 public class ClientSynthSpeaker extends SynthSpeaker {
+    private boolean startScheduled = false;
     private @Nullable SynthSoundInstance soundInstance = null;
 
     public ClientSynthSpeaker(SynthBlockEntity synthBlockEntity) {
@@ -30,6 +31,12 @@ public class ClientSynthSpeaker extends SynthSpeaker {
     }
 
     @Override
+    public void start() {
+        super.start();
+        this.startScheduled = false;
+    }
+
+    @Override
     public void stop() {
         super.stop();
         this.killSoundInstance();
@@ -46,9 +53,12 @@ public class ClientSynthSpeaker extends SynthSpeaker {
         super.onLoad(level);
         // A client synth output is created on the singleplayer server
         if (level == null || !level.isClientSide()) return;
-        if (this.synthBlockEntity.getBlockState().getOptionalValue(SpeakerBlock.POWERED).orElse(false))
-            this.start();
-        else this.stop();
+        if (this.synthBlockEntity.getBlockState().getOptionalValue(SpeakerBlock.POWERED).orElse(false)) {
+            if (!this.startScheduled) {
+                this.startScheduled = true;
+                Minecraft.getInstance().schedule(this::start);
+            }
+        } else this.stop();
     }
 
     private static SoundManager soundManager() {

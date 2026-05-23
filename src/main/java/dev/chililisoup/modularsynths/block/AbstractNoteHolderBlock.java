@@ -1,5 +1,6 @@
 package dev.chililisoup.modularsynths.block;
 
+import dev.chililisoup.modularsynths.block.state.ModBlockStateProperties;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.FrontAndTop;
@@ -9,14 +10,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractNoteHolderBlock<T extends AbstractSynth> extends AbstractSynthBlock<T> {
-    public static final IntegerProperty NOTE = BlockStateProperties.NOTE;
+    public static final IntegerProperty NOTE = ModBlockStateProperties.SYNTH_NOTE;
     private static final Vec2[] OUTPUT_POSITION = new Vec2[]{new Vec2(8F / 16F, 4F / 16F)};
 
     public AbstractNoteHolderBlock(Properties properties, Class<T> synthClass) {

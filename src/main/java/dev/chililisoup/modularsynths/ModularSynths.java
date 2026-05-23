@@ -23,6 +23,7 @@ import org.joml.Vector3fc;
 public final class ModularSynths implements ModInitializer {
     public static final String MOD_ID = "modularsynths";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    public static final boolean IS_DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
     public static final AttachmentType<CableDraw> CABLE_DRAW = AttachmentRegistry.create(
             id("cable_draw"),

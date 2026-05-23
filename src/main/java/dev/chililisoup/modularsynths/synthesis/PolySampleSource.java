@@ -1,6 +1,12 @@
 package dev.chililisoup.modularsynths.synthesis;
 
-public record PolySampleSource(double[]... polySamples) {
+public record PolySampleSource(int id, double[]... polySamples) {
+    private static int GLOBAL_ID = 0;
+
+    public PolySampleSource(double[]... polySamples) {
+        this(GLOBAL_ID++, polySamples);
+    }
+
     public static PolySampleSource merged(int size, PolySampleSource... sources) {
         if (sources.length < 1) return new PolySampleSource(new double[size]);
         if (sources.length == 1) return sources[0];

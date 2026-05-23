@@ -1,7 +1,7 @@
 package dev.chililisoup.modularsynths.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.chililisoup.modularsynths.client.inject.ModularSynthsSubmitNodeCollection;
+import dev.chililisoup.modularsynths.inject.client.ModularSynthsSubmitNodeCollection;
 import dev.chililisoup.modularsynths.client.renderer.feature.CableFeatureRenderState;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollection;

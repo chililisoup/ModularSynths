@@ -1,6 +1,6 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
-import dev.chililisoup.modularsynths.block.DialBlock;
+import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
 
@@ -18,8 +18,8 @@ public class DialSynth extends MessageSupplierSynth {
 
     public double getValue() {
         return this.synthBlockEntity.getBlockState().getValueOrElse(
-                DialBlock.NOTE, 0
-        ) / 24.0;
+                AbstractNoteHolderBlock.NOTE, 0
+        ) / 36.0;
     }
 
     @Override

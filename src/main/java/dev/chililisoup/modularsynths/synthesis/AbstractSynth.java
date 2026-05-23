@@ -52,6 +52,10 @@ public abstract class AbstractSynth {
         return InputSampleSource::get;
     }
 
+    public @Nullable Runnable bufferCleanupTask() {
+        return null;
+    }
+
     public List<InPort> getInputList() {
         return List.of(this.inputs);
     }
@@ -180,9 +184,9 @@ public abstract class AbstractSynth {
         this.updateConnectedSpeaker(new HashSet<>(), 0);
     }
 
-    public void updateConnectedSpeaker(HashSet<BlockPos> checked, int depth) {
+    public boolean updateConnectedSpeaker(HashSet<BlockPos> checked, int depth) {
         Level level = this.synthBlockEntity.getLevel();
-        if (level == null) return;
+        if (level == null) return false;
 
         ArrayList<AbstractSynth> toUpdate = new ArrayList<>();
         for (OutPort port : this.outputs) for (SynthOutputConnection connection : port.connections) {
@@ -194,13 +198,17 @@ public abstract class AbstractSynth {
 
             if (blockEntity.synth instanceof SynthSpeaker) {
                 blockEntity.setChanged();
-                return;
+                return true;
             }
 
             if (depth < ModularSynths.MAX_SEARCH_DEPTH) toUpdate.add(blockEntity.synth);
         }
 
-        toUpdate.forEach(synth -> synth.updateConnectedSpeaker(checked, depth + 1));
+        for (AbstractSynth synth : toUpdate) if (
+                synth.updateConnectedSpeaker(checked, depth + 1)
+        ) return true;
+
+        return false;
     }
 
     public boolean inputEmpty(int inPort) {

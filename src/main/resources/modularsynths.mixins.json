@@ -6,6 +6,7 @@
   "client": [
     "client.ChannelMixin",
     "client.FeatureRenderDispatcherMixin",
+    "client.LocalPlayerMixin",
     "client.OrderedSubmitNodeCollectorMixin",
     "client.SubmitNodeCollectionMixin",
     "client.SubmitNodeStorageMixin"

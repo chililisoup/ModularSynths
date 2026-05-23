@@ -1,7 +1,7 @@
 package dev.chililisoup.modularsynths.client.renderer.feature;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.chililisoup.modularsynths.client.inject.ModularSynthsSubmitNodeCollection;
+import dev.chililisoup.modularsynths.inject.client.ModularSynthsSubmitNodeCollection;
 import dev.chililisoup.modularsynths.client.reg.ModRenderTypes;
 import dev.chililisoup.modularsynths.client.renderer.CableRenderState;
 import net.fabricmc.api.EnvType;

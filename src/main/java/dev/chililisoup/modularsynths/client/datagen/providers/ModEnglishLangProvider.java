@@ -1,14 +1,17 @@
 package dev.chililisoup.modularsynths.client.datagen.providers;
 
+import dev.chililisoup.modularsynths.reg.ModBlocks;
 import dev.chililisoup.modularsynths.reg.ModCreativeTabs;
 import dev.chililisoup.modularsynths.reg.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -21,15 +24,26 @@ public final class ModEnglishLangProvider extends FabricLanguageProvider {
     }
 
     @Override
-    public void generateTranslations(HolderLookup.@NonNull Provider registryLookup, @NonNull TranslationBuilder translationBuilder) {
-        translationBuilder.add(ModCreativeTabs.MAIN, "Modular Synths");
-        translationBuilder.add(ModItems.PATCH_CABLE, "Patch Cable");
+    public void generateTranslations(HolderLookup.@NonNull Provider registryLookup, @NonNull TranslationBuilder builder) {
+        builder.add(ModCreativeTabs.MAIN, "Modular Synths");
+        builder.add(ModItems.PATCH_CABLE, "Patch Cable");
 
-        SYNTH_BLOCKS.forEach(synthBlock -> translationBuilder.add(
+        ArrayList<Block> synthBlocks = new ArrayList<>(SYNTH_BLOCKS);
+        addAndRemove(builder, synthBlocks, ModBlocks.LFO, "LFO");
+        addAndRemove(builder, synthBlocks, ModBlocks.MIDI_INPUT, "MIDI Input");
+
+        synthBlocks.forEach(synthBlock -> builder.add(
                 synthBlock,
                 Arrays.stream(BuiltInRegistries.BLOCK.getKey(synthBlock).getPath().split("_"))
                         .map(StringUtils::capitalize)
                         .collect(Collectors.joining(" "))
         ));
+    }
+
+    private static void addAndRemove(
+            TranslationBuilder translationBuilder, ArrayList<Block> blockList, Block block, String translation
+    ) {
+        blockList.remove(block);
+        translationBuilder.add(block, translation);
     }
 }

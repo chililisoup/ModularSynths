@@ -6,14 +6,13 @@ import dev.chililisoup.modularsynths.synthesis.InputSampleSource;
 import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
 import dev.chililisoup.modularsynths.synthesis.SynthGraph;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 import java.util.function.Function;
 
 public class WaveSourceSynth extends AbstractSynth {
-    private final WaveType sine = new WaveType(SynthesisFunctions::sineWave);
-    private final WaveType square = new WaveType(SynthesisFunctions::squareWave);
-    private final WaveType triangle = new WaveType(SynthesisFunctions::triangleWave);
-    private final WaveType sawtooth = new WaveType(SynthesisFunctions::sawtoothWave);
+    private Int2DoubleOpenHashMap phases = new Int2DoubleOpenHashMap();
+    private Int2DoubleOpenHashMap previousPhases = new Int2DoubleOpenHashMap();
 
     public WaveSourceSynth(SynthBlockEntity synthBlockEntity) {
         super(synthBlockEntity);
@@ -21,39 +20,48 @@ public class WaveSourceSynth extends AbstractSynth {
 
     @Override
     public int[] dependenciesFor(int outPort) {
-        return new int[]{outPort};
+        return new int[]{0};
     }
 
     @Override
     public SynthGraph.NodeProcessor processorFor(int outPort) {
         return switch (outPort) {
-            case 0 -> this.sine::process;
-            case 1 -> this.square::process;
-            case 2 -> this.triangle::process;
-            default -> this.sawtooth::process;
+            case 0 -> (inputs, size) -> this.process(inputs, size, SynthesisFunctions::sineWave, 0.25);
+            case 1 -> (inputs, size) -> this.process(inputs, size, SynthesisFunctions::squareWave, 0.15);
+            case 2 -> (inputs, size) -> this.process(inputs, size, SynthesisFunctions::triangleWave, 0.35);
+            default -> (inputs, size) -> this.process(inputs, size, SynthesisFunctions::sawtoothWave, 0.25);
         };
     }
 
-    private static class WaveType {
-        private double phase = 0.0;
-        private final Function<Double, Double> waveFunction;
+    private PolySampleSource process(InputSampleSource inputs, int size, Function<Double, Double> waveFunction, double amplitude) {
+        PolySampleSource polyInputSamples = inputs.get(size);
+        double[][] polySamples = new double[polyInputSamples.channels()][];
 
-        WaveType(Function<Double, Double> waveFunction) {
-            this.waveFunction = waveFunction;
-        }
-
-        PolySampleSource process(InputSampleSource inputs, int size) {
-            double[] inputSamples = inputs.get(size).monoSamples(size);
+        for (int channel = 0; channel < polyInputSamples.channels(); channel++) {
+            double[] inputSamples = polyInputSamples.polySamples()[channel];
             double[] samples = new double[size];
 
+            double phase = this.previousPhases.get(channel);
             for (int i = 0; i < size; i++) {
                 double frequency = SynthesisFunctions.getFrequencyFromDouble(inputSamples[i]);
-                samples[i] = this.waveFunction.apply(this.phase) / 4.0;
-                this.phase += SynthesisFunctions.waveStep(frequency);
+                samples[i] = waveFunction.apply(phase) * amplitude;
+                phase += SynthesisFunctions.waveStep(frequency);
             }
 
-            this.phase = this.phase % 1.0;
-            return new PolySampleSource(samples);
+            this.phases.put(channel, phase);
+            polySamples[channel] = samples;
         }
+
+        return new PolySampleSource(polySamples);
+    }
+
+    @Override
+    public Runnable bufferCleanupTask() {
+        return this::updatePhases;
+    }
+
+    private void updatePhases() {
+        this.previousPhases = this.phases;
+        this.phases = new Int2DoubleOpenHashMap();
     }
 }
