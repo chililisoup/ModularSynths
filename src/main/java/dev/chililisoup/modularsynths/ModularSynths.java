@@ -54,6 +54,7 @@ public final class ModularSynths implements ModInitializer {
         ModBlocks.init();
         ModItems.init();
         ModEventListeners.init();
+        ModPayloadTypes.init();
     }
 
     public record CableDraw(BlockPos pos, int port, boolean isInput, Vector3f portPos) {

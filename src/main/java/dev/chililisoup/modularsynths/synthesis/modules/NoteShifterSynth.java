@@ -3,6 +3,7 @@ package dev.chililisoup.modularsynths.synthesis.modules;
 import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
+import net.minecraft.network.chat.Component;
 
 public class NoteShifterSynth extends MessageSupplierSynth {
     public NoteShifterSynth(SynthBlockEntity synthBlockEntity) {
@@ -10,9 +11,9 @@ public class NoteShifterSynth extends MessageSupplierSynth {
     }
 
     @Override
-    public String getMessage() {
+    public Component getMessage() {
         int shift = this.getShift();
-        return String.format("%s%d", shift > 0 ? "+" : "", shift);
+        return Component.literal(String.format("%s%d", shift > 0 ? "+" : "", shift));
     }
 
     public int getShift() {

@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.audio.Channel;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.client.audio.SynthesizedAudioStream;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,6 +34,7 @@ public abstract class ChannelMixin {
     @Inject(method = "getState", at = @At("RETURN"), cancellable = true)
     private void checkState(CallbackInfoReturnable<Integer> cir) {
         if (cir.getReturnValue() != 4116) return;
+        if (!Minecraft.getInstance().isRunning()) return;
 
         Channel channel = (Channel) (Object) this;
         if (!channel.initialized.get()) return;

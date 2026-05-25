@@ -1,15 +1,15 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
-import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import dev.chililisoup.modularsynths.synthesis.InputSampleSource;
 import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
 import dev.chililisoup.modularsynths.synthesis.SynthGraph;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import org.jspecify.annotations.Nullable;
 
 public class MonitorSynth extends AbstractSynth {
-    private double[] storedSamples = new double[ModularSynths.SAMPLE_BUFFER_SIZE];
+    private double @Nullable [] storedSamples = null;
     private double phase = 0.0;
     private double period = 0.0;
 
@@ -17,7 +17,7 @@ public class MonitorSynth extends AbstractSynth {
         super(synthBlockEntity);
     }
 
-    public double[] storedSamples() {
+    public double @Nullable [] storedSamples() {
         return this.storedSamples;
     }
 
@@ -54,5 +54,12 @@ public class MonitorSynth extends AbstractSynth {
         this.period = period;
 
         return new PolySampleSource(samples);
+    }
+
+    @Override
+    public void powerOff() {
+        this.storedSamples = null;
+        this.phase = 0.0;
+        this.period = 0.0;
     }
 }

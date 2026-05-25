@@ -3,6 +3,8 @@ package dev.chililisoup.modularsynths.util;
 import dev.chililisoup.modularsynths.ModularSynths;
 
 public final class SynthesisFunctions {
+    public static final double F_SHARP = getFrequencyFromDouble(getDoubleFromNote(69));
+
     public static double getDoubleFromNote(double note) {
         return note / 64.0 - 1.0;
     }

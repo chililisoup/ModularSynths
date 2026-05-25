@@ -28,6 +28,7 @@ public class SynthModuleRenderers {
         RENDERERS.put(ModBlocks.DIAL, new MessageSupplierRenderer());
         RENDERERS.put(ModBlocks.NOTE_SUPPLIER, new MessageSupplierRenderer());
         RENDERERS.put(ModBlocks.NOTE_SHIFTER, new MessageSupplierRenderer());
+        RENDERERS.put(ModBlocks.POLY_TO_MONO, new MessageSupplierRenderer());
         RENDERERS.put(ModBlocks.MONITOR, new MonitorRenderer());
     }
 

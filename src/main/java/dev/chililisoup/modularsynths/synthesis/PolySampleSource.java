@@ -51,14 +51,24 @@ public record PolySampleSource(int id, double[]... polySamples) {
                 new double[size];
     }
 
-    public double[] monoSamples(int size) {
-        if (this.channels() < 1) return new double[size];
-        if (this.channels() == 1) return this.polySamples[0].clone();
+    public double[] monoSamples(int size, boolean shouldSum) {
+        int channels = this.channels();
+        if (channels < 1) return new double[size];
+        if (channels == 1) return this.polySamples[0].clone();
 
         double[] monoSamples = new double[size];
-        for (int i = 0; i < size; i++)
+
+        if (shouldSum) for (int i = 0; i < size; i++)
             for (double[] channel : this.polySamples)
-                monoSamples[i] += channel[i] / this.channels();
+                monoSamples[i] += channel[i];
+        else for (int i = 0; i < size; i++)
+            for (double[] channel : this.polySamples)
+                monoSamples[i] += channel[i] / channels;
+
         return monoSamples;
+    }
+
+    public double[] monoSamples(int size) {
+        return this.monoSamples(size, false);
     }
 }

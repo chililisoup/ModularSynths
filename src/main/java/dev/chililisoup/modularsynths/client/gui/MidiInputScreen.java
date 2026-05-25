@@ -24,8 +24,8 @@ public class MidiInputScreen extends Screen {
 
     @Override
     public void tick() {
-        if (this.midiInput.stillValid()) super.tick();
-        else this.onClose();
+        if (this.minecraft.player == null || !this.midiInput.stillValid())
+            this.onClose();
     }
 
     @Override

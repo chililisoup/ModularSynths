@@ -10,6 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -74,10 +76,24 @@ public abstract class AbstractSynth {
         for (int i = 0; i < max; i++) this.outputs[i] = ports.get(i);
     }
 
-    public void onLoad(Level level) {
+    public void load(ValueInput input) {
+        this.loadInputs(input.read("inputs", AbstractSynth.INPUTS_CODEC).orElse(List.of()));
+        this.loadOutputs(input.read("outputs", AbstractSynth.OUTPUTS_CODEC).orElse(List.of()));
+    }
+
+    public void save(ValueOutput output) {
+        if (this.inputs.length > 0)
+            output.store("inputs", AbstractSynth.INPUTS_CODEC, this.getInputList());
+        if (this.outputs.length > 0)
+            output.store("outputs", AbstractSynth.OUTPUTS_CODEC, this.getOutputList());
+    }
+
+    public void afterLoad(Level level) {
         for (InPort port : this.inputs)
             port.connections.forEach(connection -> connection.updateSynth(level));
     }
+
+    public void powerOff() {}
 
     public boolean addInput(SynthInputConnection connection, int inPort) {
         if (this.inputs.length <= inPort || inPort < 0) return false;

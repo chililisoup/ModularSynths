@@ -3,6 +3,7 @@ package dev.chililisoup.modularsynths.synthesis.modules;
 import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
+import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 
@@ -12,8 +13,8 @@ public class DialSynth extends MessageSupplierSynth {
     }
 
     @Override
-    public String getMessage() {
-        return String.format("%.1f%%", this.getValue() * 100);
+    public Component getMessage() {
+        return Component.literal(String.format("%.1f%%", this.getValue() * 100));
     }
 
     public double getValue() {

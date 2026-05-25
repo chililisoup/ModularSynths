@@ -36,4 +36,9 @@ public class LfoSynth extends AbstractSynth {
         this.phase = this.phase % 1.0;
         return new PolySampleSource(samples);
     }
+
+    @Override
+    public void powerOff() {
+        this.phase = 0.0;
+    }
 }

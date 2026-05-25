@@ -31,6 +31,8 @@ public class MonitorRenderer extends AbstractSynthModuleRenderer<MonitorSynth, M
             CameraRenderState camera,
             BlockEntityRendererProvider.Context context
     ) {
+        if (state.storedSamples == null) return;
+
         poseStack.pushPose();
         transformPoseStackToFront(poseStack, state.orientation, 0.5125);
         poseStack.translate(0F, 0.15625F, 0F);
@@ -88,6 +90,8 @@ public class MonitorRenderer extends AbstractSynthModuleRenderer<MonitorSynth, M
     protected void extractRenderState(MonitorSynth synth, MonitorRenderState state, float partialTicks, FrontAndTop orientation) {
         super.extractRenderState(synth, state, partialTicks, orientation);
         state.storedSamples = synth.storedSamples();
+        if (state.storedSamples == null) return;
+
         state.period = (int) Math.round(synth.period());
         state.phase = (int) Math.round(synth.phase() % state.storedSamples.length);
         state.norm = orientation.front().getUnitVec3().toVector3f();

@@ -67,7 +67,7 @@ public class ClientMidiInput {
                         .stopNote(data[1], time);
 
                 case ShortMessage.CHANNEL_PRESSURE -> ClientMidiInput.this.synth
-                        .changeVelocity(channel, data[1], time);
+                        .changeVelocity(channel, data[1]);
 
                 case ShortMessage.PITCH_BEND -> ClientMidiInput.this.synth
                         .setPitchBend((short) (((data[2] & 0xFF) << 8) | (data[1] & 0xFF)));

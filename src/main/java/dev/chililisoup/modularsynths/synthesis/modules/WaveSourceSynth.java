@@ -64,4 +64,10 @@ public class WaveSourceSynth extends AbstractSynth {
         this.previousPhases = this.phases;
         this.phases = new Int2DoubleOpenHashMap();
     }
+
+    @Override
+    public void powerOff() {
+        this.phases.clear();
+        this.previousPhases.clear();
+    }
 }

@@ -26,6 +26,8 @@ public final class ModBlocks {
     public static final Block NOTE_SHIFTER = registerSynth("note_shifter", NoteShifterBlock::new);
     public static final Block MONITOR = registerSynth("monitor", MonitorBlock::new);
     public static final Block MIDI_INPUT = registerSynth("midi_input", MidiInputBlock::new);
+    public static final Block POLY_TO_MONO = registerSynth("poly_to_mono", PolyToMonoBlock::new);
+    public static final Block SAMPLER = registerSynth("sampler", SamplerSynthBlock::new);
     public static final Block WAVE_SOURCE = registerSynth("wave_source", properties -> new BasicSynthBlock<>(
             properties,
             WaveSourceSynth.class,

@@ -82,6 +82,11 @@ public class PortamentoSynth extends AbstractSynth {
         return new Status(from, target, last, snapNext);
     }
 
+    @Override
+    public void powerOff() {
+        this.channelStatuses.clear();
+    }
+
     private record Status(double from, double target, double last, boolean snapNext) {
         private static final Status EMPTY = new Status(0.0, 0.0, 0.0, true);
     }

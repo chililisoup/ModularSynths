@@ -25,6 +25,12 @@ public final class ModEnglishLangProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(HolderLookup.@NonNull Provider registryLookup, @NonNull TranslationBuilder builder) {
+        builder.add("modularsynths.gui.sample_screen_edit_box", "Sample Location");
+
+        String polyToMono = BuiltInRegistries.BLOCK.getKey(ModBlocks.POLY_TO_MONO).toLanguageKey();
+        builder.add(polyToMono + ".sum", "SUM");
+        builder.add(polyToMono + ".avg", "AVG");
+
         builder.add(ModCreativeTabs.MAIN, "Modular Synths");
         builder.add(ModItems.PATCH_CABLE, "Patch Cable");
 

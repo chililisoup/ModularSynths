@@ -9,13 +9,10 @@ import dev.chililisoup.modularsynths.synthesis.SynthGraph;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class MidiInputSynth extends AbstractSynth {
-    private static final int POLY_COUNT = 8;
-
-    private final ArrayList<MidiNote> noteStack = new ArrayList<>(POLY_COUNT);
+    private final @Nullable MidiNote[] noteStack = new MidiNote[8];
     private long time = System.currentTimeMillis();
     private double pitchBend = 0.0;
 
@@ -23,40 +20,117 @@ public class MidiInputSynth extends AbstractSynth {
         super(synthBlockEntity);
     }
 
-    public void addNote(byte note, byte velocity, int channel, long time) {
-        this.stopNote(note, time);
+    private int newestNoteIndex(int except) {
+        int index = -1;
+        long time = -1;
+        boolean on = false;
 
-        if (this.noteStack.size() == POLY_COUNT) {
-            for (int i = 0; i < this.noteStack.size(); i++) {
-                if (!this.noteStack.get(i).on) {
-                    this.noteStack.remove(i);
-                    break;
-                }
+        for (int i = 0; i < this.noteStack.length; i++) {
+            if (i == except) continue;
+
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote == null) continue;
+            if (index < 0) {
+                index = i;
+                time = midiNote.time;
+                on = midiNote.on;
+                continue;
             }
-
-            if (this.noteStack.size() == POLY_COUNT)
-                this.noteStack.removeFirst();
+            if (on != midiNote.on) {
+                if (on) continue;
+                index = i;
+                time = midiNote.time;
+                on = true;
+                continue;
+            }
+            if (midiNote.time > time) {
+                index = i;
+                time = midiNote.time;
+            }
         }
 
-        this.noteStack.add(new MidiNote(note, velocity, true, channel, time));
+        return index;
+    }
+
+    private int newestNoteIndex() {
+        return this.newestNoteIndex(-1);
+    }
+
+    private int oldestNoteIndex() {
+        int index = -1;
+        long time = Long.MAX_VALUE;
+        boolean on = true;
+
+        for (int i = 0; i < this.noteStack.length; i++) {
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote == null) return i;
+            if (index < 0) {
+                index = i;
+                time = midiNote.time;
+                on = midiNote.on;
+                continue;
+            }
+            if (on != midiNote.on) {
+                if (!on) continue;
+                index = i;
+                time = midiNote.time;
+                on = false;
+                continue;
+            }
+            if (midiNote.time < time) {
+                index = i;
+                time = midiNote.time;
+            }
+        }
+
+        return Math.max(index, 0);
+    }
+
+    public void addNote(byte note, byte velocity, int channel, long time) {
+        this.removeNote(note);
+        this.noteStack[this.oldestNoteIndex()] = new MidiNote(note, velocity, true, channel, time);
+    }
+
+    public void removeNote(byte note) {
+        for (int i = 0; i < this.noteStack.length; i++) {
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote != null && midiNote.note == note)
+                this.noteStack[i] = null;
+        }
     }
 
     public void stopNote(byte note, long time) {
-        for (int i = 0; i < this.noteStack.size(); i++) {
-            MidiNote midiNote = this.noteStack.get(i);
-            if (midiNote.on && midiNote.note == note) this.noteStack.set(i, new MidiNote(
-                    midiNote.note, midiNote.velocity, false, midiNote.channel, time, midiNote.withoutPrev()
-            ));
+        MidiNote removedNote = null;
+        int index = 0;
+        for (int i = 0; i < this.noteStack.length; i++) {
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote != null && midiNote.note == note) {
+                this.noteStack[i] = null;
+                removedNote = midiNote;
+                index = i;
+            }
         }
+
+        if (removedNote != null) this.noteStack[index] = new MidiNote(
+                removedNote.note, removedNote.velocity, false, removedNote.channel, time
+        );
     }
 
-    public void changeVelocity(int channel, byte velocity, long time) {
-        for (int i = 0; i < this.noteStack.size(); i++) {
-            MidiNote midiNote = this.noteStack.get(i);
-            if (midiNote.on && midiNote.channel == channel) this.noteStack.set(i, new MidiNote(
-                    midiNote.note, velocity, true, channel, time, midiNote.withoutPrev()
-            ));
+    public void changeVelocity(int channel, byte velocity) {
+        MidiNote removedNote = null;
+        int index = 0;
+        for (int i = 0; i < this.noteStack.length; i++) {
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote != null && midiNote.on && midiNote.channel == channel) {
+                this.noteStack[i] = null;
+                removedNote = midiNote;
+                index = i;
+            }
         }
+
+        if (removedNote != null) this.noteStack[index] = new MidiNote(
+                removedNote.note, velocity, true, channel, removedNote.time
+        );
     }
 
     public void setPitchBend(short pitchBend) {
@@ -66,8 +140,13 @@ public class MidiInputSynth extends AbstractSynth {
     }
 
     public void close() {
-        this.noteStack.clear();
+        Arrays.fill(this.noteStack, null);
         this.pitchBend = 0.0;
+    }
+
+    @Override
+    public void powerOff() {
+        this.close();
     }
 
     private boolean isPoly() {
@@ -80,7 +159,8 @@ public class MidiInputSynth extends AbstractSynth {
     }
 
     private PolySampleSource process(int size, int outPort) {
-        if (this.noteStack.isEmpty()) return new PolySampleSource(new double[size]);
+        if (Arrays.stream(this.noteStack).allMatch(Objects::isNull))
+            return new PolySampleSource(new double[size]);
 
         return this.isPoly() ?
                 this.processPoly(size, outPort) :
@@ -88,26 +168,30 @@ public class MidiInputSynth extends AbstractSynth {
     }
 
     private PolySampleSource processMono(int size, int outPort) {
-        MidiNote playedNote = this.noteStack.getLast();
-        for (MidiNote midiNote : this.noteStack)
-            if (midiNote.on) playedNote = midiNote;
+        int index = this.newestNoteIndex();
+        if (index < 0) return new PolySampleSource(new double[size]);
 
-        MidiNote prevNote = null;
-        for (MidiNote midiNote : this.noteStack)
-            if (midiNote.on && midiNote != playedNote && midiNote.note != playedNote.note)
-                prevNote = midiNote;
+        MidiNote playedNote = this.noteStack[index];
+        if (playedNote == null) return new PolySampleSource(new double[size]);
+
+        int prevIndex = playedNote.on ? this.newestNoteIndex(index) : -1;
+        MidiNote prevNote = prevIndex < 0 ? null : this.noteStack[index];
 
         double[] samples = new double[size];
-        this.writeSamples(samples, outPort, playedNote, prevNote != null ? prevNote : playedNote.prev);
+        this.writeSamples(samples, outPort, playedNote, playedNote.on ? prevNote : new MidiNote(
+                playedNote.note, playedNote.velocity, true, playedNote.channel, 0
+        ));
 
         return new PolySampleSource(samples);
     }
 
     private PolySampleSource processPoly(int size, int outPort) {
-        double[][] polySamples = new double[POLY_COUNT][size];
-        int processCount = Math.min(this.noteStack.size(), POLY_COUNT);
-        for (int i = 0; i < processCount; i++)
-            this.writeSamples(polySamples[i], outPort, this.noteStack.get(i));
+        double[][] polySamples = new double[this.noteStack.length][size];
+
+        for (int i = 0; i < this.noteStack.length; i++) {
+            MidiNote midiNote = this.noteStack[i];
+            if (midiNote != null) this.writeSamples(polySamples[i], outPort, midiNote, null);
+        }
 
         return new PolySampleSource(polySamples);
     }
@@ -116,6 +200,10 @@ public class MidiInputSynth extends AbstractSynth {
         int delay = (int) (midiNote.time - this.time);
         if (delay < 0) delay = 0;
         else delay = Math.min((int) (delay * (ModularSynths.SAMPLE_RATE / 1000.0)), samples.length);
+
+        if (prevNote == null && !midiNote.on) prevNote = new MidiNote(
+                midiNote.note, midiNote.velocity, true, midiNote.channel, 0
+        );
 
         boolean hasPrev = prevNote != null;
         switch (outPort) {
@@ -143,22 +231,10 @@ public class MidiInputSynth extends AbstractSynth {
         }
     }
 
-    private void writeSamples(double[] samples, int outPort, MidiNote midiNote) {
-        this.writeSamples(samples, outPort, midiNote, midiNote.prev);
-    }
-
     @Override
     public Runnable bufferCleanupTask() {
         return () -> this.time = System.currentTimeMillis();
     }
 
-    private record MidiNote(byte note, byte velocity, boolean on, int channel, long time, @Nullable MidiNote prev) {
-        private MidiNote(byte note, byte velocity, boolean on, int channel, long time) {
-            this(note, velocity, on, channel, time, null);
-        }
-
-        private MidiNote withoutPrev() {
-            return new MidiNote(this.note, this.velocity, this.on, this.channel, this.time, null);
-        }
-    }
+    private record MidiNote(byte note, byte velocity, boolean on, int channel, long time) { }
 }

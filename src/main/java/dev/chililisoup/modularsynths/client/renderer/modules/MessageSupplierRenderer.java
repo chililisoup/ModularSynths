@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.FrontAndTop;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 @Environment(EnvType.CLIENT)
@@ -52,7 +51,7 @@ public class MessageSupplierRenderer extends AbstractSynthModuleRenderer<Message
     @Override
     protected void extractRenderState(MessageSupplierSynth synth, MessageRenderState state, float partialTicks, FrontAndTop orientation) {
         super.extractRenderState(synth, state, partialTicks, orientation);
-        state.message = FormattedCharSequence.forward(synth.getMessage(), Style.EMPTY);
+        state.message = synth.getMessage().getVisualOrderText();
     }
 
     @Override

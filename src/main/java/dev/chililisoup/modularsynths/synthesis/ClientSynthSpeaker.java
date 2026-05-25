@@ -49,8 +49,8 @@ public class ClientSynthSpeaker extends SynthSpeaker {
     }
 
     @Override
-    public void onLoad(Level level) {
-        super.onLoad(level);
+    public void afterLoad(Level level) {
+        super.afterLoad(level);
         // A client synth output is created on the singleplayer server
         if (level == null || !level.isClientSide()) return;
         if (this.synthBlockEntity.getBlockState().getOptionalValue(SpeakerBlock.POWERED).orElse(false)) {

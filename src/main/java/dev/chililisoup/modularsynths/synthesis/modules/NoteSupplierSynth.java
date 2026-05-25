@@ -4,6 +4,7 @@ import dev.chililisoup.modularsynths.block.AbstractNoteHolderBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
 import dev.chililisoup.modularsynths.synthesis.*;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 
@@ -13,8 +14,8 @@ public class NoteSupplierSynth extends MessageSupplierSynth {
     }
 
     @Override
-    public String getMessage() {
-        return SynthesisFunctions.getNoteName(this.getNote());
+    public Component getMessage() {
+        return Component.literal(SynthesisFunctions.getNoteName(this.getNote()));
     }
 
     public int getNote() {

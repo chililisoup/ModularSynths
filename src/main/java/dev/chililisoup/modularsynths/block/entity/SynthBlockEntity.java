@@ -51,27 +51,22 @@ public class SynthBlockEntity extends BlockEntity {
 
     @Override
     public void setChanged() {
-        this.setChanged(GameEvent.BLOCK_ACTIVATE);
+        this.setChanged(null);
     }
 
     @Override
     protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
-        this.synth.loadInputs(input.read("inputs", AbstractSynth.INPUTS_CODEC).orElse(List.of()));
-        this.synth.loadOutputs(input.read("outputs", AbstractSynth.OUTPUTS_CODEC).orElse(List.of()));
-
+        this.synth.load(input);
         if (this.hasLevel() && ModularSynths.isClientSide()) Minecraft.getInstance().schedule(
-                () -> this.synth.onLoad(this.getLevel())
+                () -> this.synth.afterLoad(this.getLevel())
         );
     }
 
     @Override
     protected void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
-        List<AbstractSynth.InPort> inputs = this.synth.getInputList();
-        output.storeNullable("inputs", AbstractSynth.INPUTS_CODEC, inputs.isEmpty() ? null : inputs);
-        List<AbstractSynth.OutPort> outputs = this.synth.getOutputList();
-        output.storeNullable("outputs", AbstractSynth.OUTPUTS_CODEC, outputs.isEmpty() ? null : outputs);
+        this.synth.save(output);
     }
 
     @Override
