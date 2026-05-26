@@ -23,13 +23,12 @@ public abstract class AbstractEffectSynth extends AbstractSynth {
 
     private PolySampleSource process(InputSampleSource inputs, int size) {
         double[][] polySamples = inputs.get(size).safePolySamples();
-        double[][] polyControl = inputs.get(1, size).polySamples();
-        if (polyControl.length == 0) return new PolySampleSource(polySamples);
+        PolySampleSource controlSource = inputs.get(1, size);
+        if (controlSource.channels() == 0) return new PolySampleSource(polySamples);
 
         for (int channel = 0; channel < polySamples.length; channel++) this.applyEffect(
                 polySamples[channel],
-                channel < polyControl.length ?
-                        polyControl[channel] : polyControl[polyControl.length - 1]
+                controlSource.unsafeChannelSamples(channel, size)
         );
 
         return new PolySampleSource(polySamples);

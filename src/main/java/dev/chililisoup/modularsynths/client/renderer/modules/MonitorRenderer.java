@@ -93,7 +93,7 @@ public class MonitorRenderer extends AbstractSynthModuleRenderer<MonitorSynth, M
         if (state.storedSamples == null) return;
 
         state.period = (int) Math.round(synth.period());
-        state.phase = (int) Math.round(synth.phase() % state.storedSamples.length);
+        state.phase = (int) Math.round(synth.phase()) % state.storedSamples.length;
         state.norm = orientation.front().getUnitVec3().toVector3f();
         state.lineWidth = Math.max(Minecraft.getInstance().getWindow().getHeight() / 300F, 1F);
         state.display = synth.synthBlockEntity.getBlockState().getValueOrElse(MonitorBlock.DISPLAY, MonitorDisplay.STRAIGHT);

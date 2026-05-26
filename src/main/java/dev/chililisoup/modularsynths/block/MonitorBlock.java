@@ -65,7 +65,7 @@ public class MonitorBlock extends AbstractSynthBlock<MonitorSynth> {
         if (hitResult.getDirection() != orientation.front())
             return InteractionResult.PASS;
 
-        if (getPortHit(state, orientation, hitResult).isPresent())
+        if (this.getPortHit(orientation, hitResult).isPresent())
             return InteractionResult.PASS;
 
         if (!level.isClientSide())

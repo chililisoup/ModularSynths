@@ -60,7 +60,7 @@ public class PolyToMonoBlock extends AbstractSynthBlock<PolyToMonoSynth> {
         if (hitResult.getDirection() != orientation.front())
             return InteractionResult.PASS;
 
-        if (getPortHit(state, orientation, hitResult).isPresent())
+        if (this.getPortHit(orientation, hitResult).isPresent())
             return InteractionResult.PASS;
 
         if (!level.isClientSide()) level.setBlock(pos, state.cycle(SUM), Block.UPDATE_CLIENTS);

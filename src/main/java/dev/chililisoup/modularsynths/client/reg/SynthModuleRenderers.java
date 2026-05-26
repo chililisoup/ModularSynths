@@ -3,6 +3,7 @@ package dev.chililisoup.modularsynths.client.reg;
 import dev.chililisoup.modularsynths.client.renderer.AbstractSynthModuleRenderer;
 import dev.chililisoup.modularsynths.client.renderer.modules.MessageSupplierRenderer;
 import dev.chililisoup.modularsynths.client.renderer.modules.MonitorRenderer;
+import dev.chililisoup.modularsynths.client.renderer.modules.OscillatorRenderer;
 import dev.chililisoup.modularsynths.reg.ModBlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -30,6 +31,7 @@ public class SynthModuleRenderers {
         RENDERERS.put(ModBlocks.NOTE_SHIFTER, new MessageSupplierRenderer());
         RENDERERS.put(ModBlocks.POLY_TO_MONO, new MessageSupplierRenderer());
         RENDERERS.put(ModBlocks.MONITOR, new MonitorRenderer());
+        RENDERERS.put(ModBlocks.OSCILLATOR, new OscillatorRenderer());
     }
 
     public static void init() {}

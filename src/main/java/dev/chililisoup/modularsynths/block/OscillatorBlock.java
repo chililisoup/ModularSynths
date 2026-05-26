@@ -2,9 +2,10 @@ package dev.chililisoup.modularsynths.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
-import dev.chililisoup.modularsynths.synthesis.modules.SamplerSynth;
+import dev.chililisoup.modularsynths.synthesis.modules.OscillatorSynth;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.FrontAndTop;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -13,21 +14,23 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.NonNull;
 
-public class SamplerSynthBlock extends AbstractSynthBlock<SamplerSynth> {
-    private static final MapCodec<SamplerSynthBlock> CODEC = simpleCodec(SamplerSynthBlock::new);
+import java.util.Optional;
+
+public class OscillatorBlock extends AbstractSynthBlock<OscillatorSynth> {
+    private static final MapCodec<OscillatorBlock> CODEC = simpleCodec(OscillatorBlock::new);
     private static final Vec2[] INPUT_POSITIONS = new Vec2[]{
-            new Vec2(13F / 16F, 11F / 16F),
-            new Vec2(13F / 16F, 5F / 16F)
+            new Vec2(8F / 16F, 4F / 16F),
+            new Vec2(13F / 16F, 4F / 16F)
     };
-    private static final Vec2[] OUTPUT_POSITION = new Vec2[]{new Vec2(3F / 16F, 8F / 16F)};
+    private static final Vec2[] OUTPUT_POSITION = new Vec2[]{new Vec2(3F / 16F, 4F / 16F)};
 
     @Override
-    protected @NonNull MapCodec<SamplerSynthBlock> codec() {
+    protected @NonNull MapCodec<OscillatorBlock> codec() {
         return CODEC;
     }
 
-    public SamplerSynthBlock(Properties properties) {
-        super(properties, SamplerSynth.class);
+    public OscillatorBlock(Properties properties) {
+        super(properties, OscillatorSynth.class);
     }
 
     @Override
@@ -41,8 +44,8 @@ public class SamplerSynthBlock extends AbstractSynthBlock<SamplerSynth> {
     }
 
     @Override
-    public @NonNull SamplerSynth newSynth(SynthBlockEntity synthBlockEntity) {
-        return new SamplerSynth(synthBlockEntity);
+    public @NonNull OscillatorSynth newSynth(SynthBlockEntity synthBlockEntity) {
+        return new OscillatorSynth(synthBlockEntity);
     }
 
     @Override
@@ -60,10 +63,23 @@ public class SamplerSynthBlock extends AbstractSynthBlock<SamplerSynth> {
         if (!(this.getBlockEntity(level, pos) instanceof SynthBlockEntity synthBlockEntity))
             return InteractionResult.PASS;
 
-        if (getPortHit(state, orientation, hitResult).isPresent())
+        if (!(synthBlockEntity.synth instanceof OscillatorSynth synth))
             return InteractionResult.PASS;
 
-        player.modularSynths$openSynthScreen(synthBlockEntity);
+        Optional<Vec2> hitPos = getHitPos(hitResult, orientation);
+        if (hitPos.isEmpty()) return InteractionResult.PASS;
+
+        Vec2 screenPos = new Vec2(
+                (hitPos.get().x - 2F / 16F) * 12F / 9F,
+                (hitPos.get().y - 7F / 16F) * 16F / 7F
+        );
+        if (screenPos.x < 0 || screenPos.x > 1 || screenPos.y < -0.15F || screenPos.y > 1.15F)
+            return InteractionResult.PASS;
+
+        if (!level.isClientSide()) synth.setHarmonic(
+                Mth.floor((1F - screenPos.x) * synth.getHarmonics().length),
+                screenPos.y
+        );
         return InteractionResult.SUCCESS;
     }
 }

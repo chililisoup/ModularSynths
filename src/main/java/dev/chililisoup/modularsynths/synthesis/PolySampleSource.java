@@ -46,9 +46,16 @@ public record PolySampleSource(int id, double[]... polySamples) {
     }
 
     public double[] channelSamples(int channel, int size) {
-        return this.channels() > channel && channel >= 0 ?
-                this.polySamples[channel].clone() :
-                new double[size];
+        return this.channels() == 0 ?
+                new double[size] :
+                this.unsafeChannelSamples(channel, size).clone();
+    }
+
+    public double[] unsafeChannelSamples(int channel, int size) {
+        if (this.channels() == 0) return new double[size];
+        return channel > 0 ?
+                this.polySamples[Math.min(channel, this.polySamples.length - 1)] :
+                this.polySamples[0];
     }
 
     public double[] monoSamples(int size, boolean shouldSum) {

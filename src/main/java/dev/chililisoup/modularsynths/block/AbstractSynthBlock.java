@@ -100,7 +100,7 @@ public abstract class AbstractSynthBlock<T extends AbstractSynth> extends BaseEn
         BlockHitResult hitResult = ModUtil.getHitResult(level, player);
         if (!hitResult.getBlockPos().equals(pos)) return false;
 
-        Optional<PortHit> portHit = getPortHit(state, orientation, hitResult);
+        Optional<PortHit> portHit = this.getPortHit(orientation, hitResult);
         if (portHit.isEmpty()) return false;
 
         if (portHit.get().isInput) synth.popInputs(portHit.get().port, face);
@@ -127,10 +127,8 @@ public abstract class AbstractSynthBlock<T extends AbstractSynth> extends BaseEn
         return Optional.empty();
     }
 
-    public static Optional<PortHit> getPortHit(BlockState state, FrontAndTop orientation, BlockHitResult hitResult) {
-        return state.getBlock() instanceof AbstractSynthBlock<?> synthBlock ?
-                getPortHit(synthBlock, orientation, hitResult) :
-                Optional.empty();
+    public Optional<PortHit> getPortHit(FrontAndTop orientation, BlockHitResult hitResult) {
+        return getPortHit(this, orientation, hitResult);
     }
 
     public static int hitPort(Vec2 hitPos, Vec2[] ports) {

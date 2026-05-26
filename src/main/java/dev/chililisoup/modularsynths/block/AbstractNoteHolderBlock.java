@@ -41,7 +41,7 @@ public abstract class AbstractNoteHolderBlock<T extends AbstractSynth> extends A
         if (hitResult.getDirection() != orientation.front())
             return InteractionResult.PASS;
 
-        if (getPortHit(state, orientation, hitResult).isPresent())
+        if (this.getPortHit(orientation, hitResult).isPresent())
             return InteractionResult.PASS;
 
         if (!level.isClientSide()) {

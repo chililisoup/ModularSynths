@@ -61,7 +61,7 @@ public class MidiInputBlock extends AbstractSynthBlock<MidiInputSynth> {
         if (!(this.getBlockEntity(level, pos) instanceof SynthBlockEntity synthBlockEntity))
             return InteractionResult.PASS;
 
-        if (getPortHit(state, orientation, hitResult).isPresent())
+        if (this.getPortHit(orientation, hitResult).isPresent())
             return InteractionResult.PASS;
 
         if (player.isShiftKeyDown()) {

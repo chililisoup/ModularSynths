@@ -48,7 +48,7 @@ public class WaveSourceSynth extends AbstractSynth {
                 phase += SynthesisFunctions.waveStep(frequency);
             }
 
-            this.phases.put(channel, phase);
+            this.phases.put(channel, phase % 1.0);
             polySamples[channel] = samples;
         }
 

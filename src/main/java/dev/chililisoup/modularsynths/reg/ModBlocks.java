@@ -27,7 +27,8 @@ public final class ModBlocks {
     public static final Block MONITOR = registerSynth("monitor", MonitorBlock::new);
     public static final Block MIDI_INPUT = registerSynth("midi_input", MidiInputBlock::new);
     public static final Block POLY_TO_MONO = registerSynth("poly_to_mono", PolyToMonoBlock::new);
-    public static final Block SAMPLER = registerSynth("sampler", SamplerSynthBlock::new);
+    public static final Block SAMPLER = registerSynth("sampler", SamplerBlock::new);
+    public static final Block OSCILLATOR = registerSynth("oscillator", OscillatorBlock::new);
     public static final Block WAVE_SOURCE = registerSynth("wave_source", properties -> new BasicSynthBlock<>(
             properties,
             WaveSourceSynth.class,
@@ -91,6 +92,31 @@ public final class ModBlocks {
             new Vec2[]{
                     new Vec2(13F / 16F, 11F / 16F),
                     new Vec2(13F / 16F, 5F / 16F)
+            },
+            new Vec2[]{new Vec2(3F / 16F, 8F / 16F)}
+    ));
+    public static final Block ENVELOPE = registerSynth("envelope", properties -> new BasicSynthBlock<>(
+            properties,
+            EnvelopeSynth.class,
+            EnvelopeSynth::new,
+            new Vec2[]{
+                    new Vec2(13F / 16F, 12F / 16F),
+                    new Vec2(13F / 16F, 8F / 16F),
+                    new Vec2(14F / 16F, 3F / 16F),
+                    new Vec2(10F / 16F, 3F / 16F),
+                    new Vec2(6F / 16F, 3F / 16F),
+                    new Vec2(2F / 16F, 3F / 16F)
+            },
+            new Vec2[]{new Vec2(3F / 16F, 12F / 16F)}
+    ));
+    public static final Block MIX = registerSynth("mix", properties -> new BasicSynthBlock<>(
+            properties,
+            MixSynth.class,
+            MixSynth::new,
+            new Vec2[]{
+                    new Vec2(13F / 16F, 13F / 16F),
+                    new Vec2(13F / 16F, 7F / 16F),
+                    new Vec2(13F / 16F, 3F / 16F)
             },
             new Vec2[]{new Vec2(3F / 16F, 8F / 16F)}
     ));
