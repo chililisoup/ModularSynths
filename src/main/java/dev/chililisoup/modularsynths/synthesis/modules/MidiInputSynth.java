@@ -1,5 +1,8 @@
 package dev.chililisoup.modularsynths.synthesis.modules;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.chililisoup.modularsynths.ModularSynths;
 import dev.chililisoup.modularsynths.block.MidiInputBlock;
 import dev.chililisoup.modularsynths.block.entity.SynthBlockEntity;
@@ -7,17 +10,52 @@ import dev.chililisoup.modularsynths.synthesis.AbstractSynth;
 import dev.chililisoup.modularsynths.synthesis.PolySampleSource;
 import dev.chililisoup.modularsynths.synthesis.SynthGraph;
 import dev.chililisoup.modularsynths.util.SynthesisFunctions;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
 public class MidiInputSynth extends AbstractSynth {
     private final @Nullable MidiNote[] noteStack = new MidiNote[8];
+    private long lastReceivedTime = 0;
     private long time = System.currentTimeMillis();
     private double pitchBend = 0.0;
+    private @Nullable UUID controllingPlayer;
 
     public MidiInputSynth(SynthBlockEntity synthBlockEntity) {
         super(synthBlockEntity);
+    }
+
+    public void setControllingPlayer(@Nullable UUID playerUUID) {
+        this.controllingPlayer = playerUUID;
+        if (this.controllingPlayer == null) this.close();
+    }
+
+    public @Nullable UUID getControllingPlayer() {
+        return this.controllingPlayer;
+    }
+
+    public boolean playCanNoLongerControl() {
+        if (this.controllingPlayer == null) return false;
+        Level level = this.synthBlockEntity.getLevel();
+        if (level == null) return true;
+        Player controllingPlayer = level.getPlayerByUUID(this.controllingPlayer);
+        return controllingPlayer == null || !controllingPlayer.isWithinBlockInteractionRange(
+                this.synthBlockEntity.getBlockPos(), 4.0
+        );
+    }
+
+    private void clearControllingPlayerIfInvalid() {
+        if (this.playCanNoLongerControl()) this.setControllingPlayer(null);
+    }
+
+    public static void tick(SynthBlockEntity synthBlockEntity) {
+        if (synthBlockEntity.synth instanceof MidiInputSynth synth)
+            synth.clearControllingPlayerIfInvalid();
     }
 
     private int newestNoteIndex(int except) {
@@ -139,9 +177,42 @@ public class MidiInputSynth extends AbstractSynth {
                 0.0;
     }
 
+    public double getPitchBend() {
+        return this.pitchBend;
+    }
+
+    public List<NetworkedMidiNote> getNetworkedNoteStack() {
+        return Arrays.stream(this.noteStack).anyMatch(Objects::nonNull) ?
+                Arrays.stream(this.noteStack).map(NetworkedMidiNote::new).toList() :
+                List.of();
+    }
+
+    public boolean updateMidiInputServer(Player player, long time, List<NetworkedMidiNote> noteStack) {
+        if (!player.getUUID().equals(this.controllingPlayer)) return false;
+        if (noteStack.size() != this.noteStack.length) {
+            this.setControllingPlayer(null);
+            this.close();
+            return true;
+        }
+
+        if (this.lastReceivedTime > time) return false;
+        this.lastReceivedTime = time;
+        return true;
+    }
+
+    public void updateMidiInputClient(long time, double pitchBend, List<NetworkedMidiNote> noteStack) {
+        this.pitchBend = pitchBend;
+        long offset = this.time - time;
+        for (int i = 0; i < noteStack.size(); i++)
+            this.noteStack[i] = noteStack.get(i).midiNote
+                    .map(midiNote -> midiNote.withOffset(offset))
+                    .orElse(null);
+    }
+
     public void close() {
         Arrays.fill(this.noteStack, null);
         this.pitchBend = 0.0;
+        this.lastReceivedTime = 0;
     }
 
     @Override
@@ -236,5 +307,29 @@ public class MidiInputSynth extends AbstractSynth {
         return () -> this.time = System.currentTimeMillis();
     }
 
-    private record MidiNote(byte note, byte velocity, boolean on, int channel, long time) { }
+    public record NetworkedMidiNote(Optional<MidiNote> midiNote) {
+        public static final MapCodec<NetworkedMidiNote> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                MidiNote.CODEC.codec().optionalFieldOf("midiNote").forGetter(NetworkedMidiNote::midiNote)
+        ).apply(i, NetworkedMidiNote::new));
+
+        public static final StreamCodec<ByteBuf, NetworkedMidiNote> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC.codec());
+
+        public NetworkedMidiNote(@Nullable MidiNote midiNote) {
+            this(Optional.ofNullable(midiNote));
+        }
+    }
+
+    public record MidiNote(byte note, byte velocity, boolean on, int channel, long time) {
+        public static final MapCodec<MidiNote> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.BYTE.fieldOf("note").forGetter(MidiNote::note),
+                Codec.BYTE.fieldOf("velocity").forGetter(MidiNote::velocity),
+                Codec.BOOL.fieldOf("on").forGetter(MidiNote::on),
+                Codec.INT.fieldOf("channel").forGetter(MidiNote::channel),
+                Codec.LONG.fieldOf("time").forGetter(MidiNote::time)
+        ).apply(i, MidiNote::new));
+
+        public MidiNote withOffset(long offset) {
+            return new MidiNote(this.note, this.velocity, this.on, this.channel, this.time + offset);
+        }
+    }
 }

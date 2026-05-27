@@ -12,7 +12,8 @@
     "client.SubmitNodeStorageMixin"
   ],
   "mixins": [
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

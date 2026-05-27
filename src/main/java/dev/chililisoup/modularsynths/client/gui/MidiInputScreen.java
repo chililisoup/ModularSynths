@@ -13,9 +13,11 @@ import org.jspecify.annotations.NonNull;
 
 @Environment(EnvType.CLIENT)
 public class MidiInputScreen extends Screen {
+    private static final int UPDATE_INTERVAL = 2;
     private static final Identifier BACKGROUND = ModularSynths.id("textures/gui/midi.png");
 
     private final ClientMidiInput midiInput;
+    private long tickCount = 0;
 
     public MidiInputScreen(MidiInputSynth synth) {
         super(synth.synthBlockEntity.getBlockState().getBlock().getName());
@@ -24,8 +26,13 @@ public class MidiInputScreen extends Screen {
 
     @Override
     public void tick() {
-        if (this.minecraft.player == null || !this.midiInput.stillValid())
+        if (this.minecraft.player == null || this.midiInput.isInvalid()) {
             this.onClose();
+            return;
+        }
+
+        if (this.tickCount++ % UPDATE_INTERVAL == 0)
+            this.midiInput.maybeSendPayload();
     }
 
     @Override

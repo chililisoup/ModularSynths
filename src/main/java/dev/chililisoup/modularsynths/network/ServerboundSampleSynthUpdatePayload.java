@@ -22,7 +22,7 @@ public record ServerboundSampleSynthUpdatePayload(BlockPos pos, Identifier sampl
 
     @Override
     public @NonNull Type<ServerboundSampleSynthUpdatePayload> type() {
-        return ModPayloadTypes.SAMPLE_SYNTH_UPDATE;
+        return ModPayloadTypes.SERVERBOUND_SAMPLE_SYNTH_UPDATE;
     }
 
     public static void handle(ServerboundSampleSynthUpdatePayload payload, ServerPlayNetworking.Context context) {
